@@ -12,5 +12,19 @@
     </padding>
 
     <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
+
+    <Button text="Login"
+            prefWidth="250"
+            prefHeight="60"
+            onAction="#onHelloButtonClick"/>
+
+    <Button text="Register"
+            prefWidth="250"
+            prefHeight="60"
+            onAction="#onHelloButtonClick"/>
+
+    <Button text="Exit"
+            prefWidth="250"
+            prefHeight="60"
+            onAction="#onHelloButtonClick"/>
 </VBox>
