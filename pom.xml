@@ -134,7 +134,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.siliconsquad.siliconsquadmoviebooking/com.siliconsquad.siliconsquadmoviebooking.HelloApplication
+                                com.siliconsquad.siliconsquadmoviebooking/com.siliconsquad.siliconsquadmoviebooking.BookingApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

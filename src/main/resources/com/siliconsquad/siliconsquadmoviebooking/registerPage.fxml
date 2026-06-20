@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
+   <right>
+      <VBox alignment="CENTER" prefHeight="400.0" prefWidth="354.0" style="-fx-background-color: lightgray;" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" prefHeight="79.0" prefWidth="240.0">
+               <children>
+                  <Label prefHeight="17.0" prefWidth="80.0" text="Username" />
+                  <TextField style="-fx-background-radius: 50; -fx-border-radius: 50;" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="171.0" prefHeight="79.0" prefWidth="240.0">
+               <children>
+                  <Label prefHeight="17.0" prefWidth="80.0" text="Password" />
+                  <PasswordField style="-fx-background-radius: 50; -fx-border-radius: 50;" />
+               </children>
+            </HBox>
+            <Button mnemonicParsing="false" prefHeight="49.0" prefWidth="78.0" text="Signup" />
+         </children></VBox>
+   </right>
+   <left>
+      <VBox alignment="CENTER" prefHeight="400.0" prefWidth="247.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="backbutton" mnemonicParsing="false" onAction="#backToMain" prefHeight="70.0" prefWidth="84.0" text="Back" />
+         </children>
+      </VBox>
+   </left>
+</BorderPane>
