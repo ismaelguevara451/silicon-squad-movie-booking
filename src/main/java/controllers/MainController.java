@@ -17,12 +17,20 @@ public class MainController {
     @FXML
     private Button registerbutton;
 
+    @FXML
+    private Button loginButton;
 
     // Methods
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Still work in progress!");
+    protected void loginButtonClick() throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("loginPage.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
+
+        Stage stage = (Stage)loginButton.getScene().getWindow();
+        stage.setScene(scene);
+
+        stage.show();
     }
 
     @FXML

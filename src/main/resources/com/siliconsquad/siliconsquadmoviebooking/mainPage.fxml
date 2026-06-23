@@ -11,7 +11,7 @@
 
     <Label fx:id="welcomeText" />
 
-    <Button fx:id="loginbutton" onAction="#onHelloButtonClick" prefHeight="60" prefWidth="250" text="Login" />
+    <Button fx:id="loginButton" onAction="#loginButtonClick" prefHeight="60" prefWidth="250" text="Login" />
 
     <Button fx:id="registerbutton" onAction="#registerButtonClick" prefHeight="60" prefWidth="250" text="Register" />
 
