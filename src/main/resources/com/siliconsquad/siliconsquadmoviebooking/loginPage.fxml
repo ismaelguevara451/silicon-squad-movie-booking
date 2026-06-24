@@ -3,26 +3,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: lightblue;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="main-background" stylesheets="@background.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
     <right>
         <VBox alignment="CENTER" prefHeight="400.0" prefWidth="354.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
             <children>
                 <HBox alignment="CENTER" prefHeight="79.0" prefWidth="240.0">
                     <children>
                         <Label id="login-username-label" prefHeight="17.0" prefWidth="80.0" text="Username" />
-                        <TextField id="login-username" style="-fx-background-radius: 50; -fx-border-radius: 50;" />
+                        <TextField id="login-username" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
                     </children>
                 </HBox>
                 <HBox alignment="CENTER" layoutX="10.0" layoutY="171.0" prefHeight="79.0" prefWidth="240.0">
                     <children>
                         <Label id="login-password-label" prefHeight="17.0" prefWidth="80.0" text="Password" />
-                        <PasswordField id="login-password" style="-fx-background-radius: 50; -fx-border-radius: 50;" />
+                        <PasswordField id="login-password" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
                     </children>
                 </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                      <Button mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Login" textFill="WHITE" />
-                      <Button fx:id="backbutton" mnemonicParsing="false" onAction="#backToMain" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Back" textFill="WHITE" />
+                      <Button fx:id="loginButton" mnemonicParsing="false" onAction="#moveToHome" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Login" textFill="WHITE" />
+                      <Button fx:id="registerButton" mnemonicParsing="false" onAction="#moveToRegister" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Register" textFill="WHITE" />
                   <Button mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Forgot Password" textFill="WHITE" />
                </children>
             </HBox>

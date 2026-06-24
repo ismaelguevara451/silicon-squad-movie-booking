@@ -14,7 +14,7 @@ public class RegisterController {
 
     @FXML
     protected void backToMain() throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("mainPage.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("loginPage.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
 
         Stage stage = (Stage)backbutton.getScene().getWindow();

@@ -1,0 +1,25 @@
+.main-background{
+    -fx-background-image:url('BG.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+}
+
+.gray-transparent-fill{
+    -fx-background-color: rgba(0,0,0, 0.5);
+}
+
+.button{
+    -fx-background-color: #1E90FF;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-text-fill: white;
+}
+
+.button:hover{
+    -fx-opacity: 0.8;
+}
+
+.button:pressed{
+    -fx-background-color: derive(#1E90FF, -20%);
+}
+

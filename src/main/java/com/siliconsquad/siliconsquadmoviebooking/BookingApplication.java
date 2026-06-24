@@ -14,7 +14,7 @@ public class BookingApplication extends Application {
     public void start(Stage stage) throws IOException {
 
         // Create FXMLLoader and the scene
-        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("mainPage.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("loginPage.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
 
         //Create Application icon and set the icon

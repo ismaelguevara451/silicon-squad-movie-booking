@@ -4,16 +4,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="540.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-
-    <Label fx:id="welcomeText" />
-
-    <Button fx:id="loginButton" onAction="#loginButtonClick" prefHeight="60" prefWidth="250" text="Login" />
-
-    <Button fx:id="registerbutton" onAction="#registerButtonClick" prefHeight="60" prefWidth="250" text="Register" />
-
-    <Button fx:id="exitbutton" onAction="#exitButtonClick" prefHeight="60" prefWidth="250" text="Exit" />
-</VBox>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="main-background" stylesheets="@background.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
+    <center>
+        <HBox prefHeight="100.0" prefWidth="0.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: lightgray;" BorderPane.alignment="CENTER" />
+    </center>
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="110.0" prefWidth="590.0" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets left="10.0" />
+            </BorderPane.margin></HBox>
+    </top>
+    <left>
+        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button mnemonicParsing="false" prefWidth="80.0" text="Search" />
+                <Button layoutX="34.0" layoutY="172.0" mnemonicParsing="false" prefWidth="80.0" text="Order food" />
+                <Button layoutX="34.0" layoutY="184.0" mnemonicParsing="false" prefWidth="80.0" text="Watch list" />
+                <Button layoutX="34.0" layoutY="197.0" mnemonicParsing="false" prefWidth="80.0" text="Rewards" />
+                <Button layoutX="34.0" layoutY="209.0" mnemonicParsing="false" prefWidth="80.0" text="Reviews" />
+                <Button layoutX="20.0" layoutY="190.0" mnemonicParsing="false" prefWidth="80.0" text="Log out" />
+            </children>
+            <BorderPane.margin>
+                <Insets top="20.0" />
+            </BorderPane.margin>
+        </VBox>
+    </left>
+    <bottom>
+        <HBox prefHeight="23.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+    </bottom>
+    <right>
+        <VBox prefHeight="325.0" prefWidth="8.0" BorderPane.alignment="CENTER" />
+    </right>
+</BorderPane>

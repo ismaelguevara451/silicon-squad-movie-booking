@@ -11,8 +11,6 @@ import javafx.stage.Stage;
 
 
 public class MainController {
-    @FXML
-    private Label welcomeText;
 
     @FXML
     private Button registerbutton;
