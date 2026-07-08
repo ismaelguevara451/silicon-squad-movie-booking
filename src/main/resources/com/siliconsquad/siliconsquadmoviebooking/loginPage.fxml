@@ -10,23 +10,24 @@
                 <HBox alignment="CENTER" prefHeight="79.0" prefWidth="240.0">
                     <children>
                         <Label id="login-username-label" prefHeight="17.0" prefWidth="80.0" text="Username" />
-                        <TextField id="login-username" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
+                        <TextField fx:id="usernameField" id="login-username" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
                     </children>
                 </HBox>
                 <HBox alignment="CENTER" layoutX="10.0" layoutY="171.0" prefHeight="79.0" prefWidth="240.0">
                     <children>
                         <Label id="login-password-label" prefHeight="17.0" prefWidth="80.0" text="Password" />
-                        <PasswordField id="login-password" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
+                        <PasswordField fx:id="passwordField" id="login-password" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
                     </children>
                 </HBox>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-               <children>
-                      <Button fx:id="loginButton" mnemonicParsing="false" onAction="#moveToHome" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Login" textFill="WHITE" />
-                      <Button fx:id="registerButton" mnemonicParsing="false" onAction="#moveToRegister" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Register" textFill="WHITE" />
-                  <Button mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Forgot Password" textFill="WHITE" />
-               </children>
-            </HBox>
-            </children></VBox>
+                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                    <children>
+                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#moveToHome" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Login" textFill="WHITE" />
+                        <Button fx:id="registerButton" mnemonicParsing="false" onAction="#moveToRegister" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Register" textFill="WHITE" />
+                        <Button fx:id="forgotPasswordButton" mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #1E90FF;" text="Forgot Password" textFill="WHITE" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
     </right>
     <left>
         <VBox alignment="CENTER" prefHeight="400.0" prefWidth="247.0" BorderPane.alignment="CENTER" />
