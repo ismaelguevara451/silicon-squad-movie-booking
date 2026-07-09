@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 public class LoginController {
 
+    // FXML components from login page
     @FXML
     private Button registerButton;
 
@@ -28,16 +29,27 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
+    // Methods down here
     @FXML
     protected void moveToRegister() throws Exception {
+
+        //Create FXMLLoader and load the page
         FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("registerPage.fxml"));
+
+        //We set the scene or page with the loaded FXMLLoader
         Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
 
+        //We choose the current stage from the registerbutton (can be taken from other parts of the stage)
         Stage stage = (Stage) registerButton.getScene().getWindow();
+
+        //We replace the stage with our current scene or page
         stage.setScene(scene);
+
+        //Display the scene or page
         stage.show();
     }
 
+    // Just testing for now
     @FXML
     protected void moveToHome() throws Exception {
         String username = usernameField.getText().trim();
