@@ -1,38 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.siliconsquad.siliconsquadmoviebooking.components.MovieBackgroundPane?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="main-background" stylesheets="@background.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
-    <center>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="0.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: lightgray;" BorderPane.alignment="CENTER">
-         <children>
-            <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
-               <content>
-                  <TilePane fx:id="movieGrid" hgap="10.0" prefHeight="354.0" prefWidth="488.0" vgap="10.0" />
-               </content>
-            </ScrollPane>
-         </children></HBox>
-    </center>
-    <left>
-        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="350.0" spacing="20.0" BorderPane.alignment="CENTER">
-            <children>
-                <Button layoutX="20.0" layoutY="190.0" mnemonicParsing="false" prefWidth="80.0" text="Log out" />
-            </children>
-            <BorderPane.margin>
-                <Insets top="20.0" />
-            </BorderPane.margin>
-        </VBox>
-    </left>
-    <right>
-        <VBox prefHeight="325.0" prefWidth="8.0" BorderPane.alignment="CENTER" />
-    </right>
-   <top>
-      <HBox alignment="CENTER" prefHeight="40.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER">
-         <children>
-                <Button mnemonicParsing="false" prefWidth="80.0" text="Search" />
-            <TextField fx:id="searchField" prefHeight="25.0" prefWidth="305.0" text="Enter name of the movie here" />
-         </children></HBox>
-   </top>
-</BorderPane>
+<StackPane maxHeight="-Infinity"
+           maxWidth="-Infinity"
+           minHeight="-Infinity"
+           minWidth="-Infinity"
+           prefHeight="400.0"
+           prefWidth="600.0"
+           styleClass="main-background"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.MainController">
+
+    <children>
+
+        <!-- White animated lines across the full blue page. -->
+        <MovieBackgroundPane />
+
+        <!-- Main page controls displayed above the animation. -->
+        <BorderPane style="-fx-background-color: transparent;">
+
+            <top>
+                <HBox alignment="CENTER"
+                      prefHeight="40.0"
+                      prefWidth="600.0"
+                      spacing="10.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER">
+
+                    <children>
+                        <Button mnemonicParsing="false"
+                                prefWidth="80.0"
+                                text="Search" />
+
+                        <TextField fx:id="searchField"
+                                   prefHeight="25.0"
+                                   prefWidth="305.0"
+                                   promptText="Enter name of the movie here" />
+                    </children>
+                </HBox>
+            </top>
+
+            <left>
+                <VBox alignment="TOP_CENTER"
+                      prefHeight="200.0"
+                      prefWidth="350.0"
+                      spacing="20.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER">
+
+                    <children>
+                        <Button fx:id="logoutButton"
+                                mnemonicParsing="false"
+                                onAction="#logoutUser"
+                                prefWidth="80.0"
+                                text="Log out" />
+                    </children>
+
+                    <BorderPane.margin>
+                        <Insets top="20.0" />
+                    </BorderPane.margin>
+                </VBox>
+            </left>
+
+            <center>
+                <HBox alignment="CENTER"
+                      prefHeight="100.0"
+                      prefWidth="0.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER">
+
+                    <children>
+                        <ScrollPane fitToWidth="true"
+                                    prefHeight="200.0"
+                                    prefWidth="200.0"
+                                    styleClass="movie-scroll-pane"
+                                    HBox.hgrow="ALWAYS">
+
+                            <content>
+                                <TilePane fx:id="movieGrid"
+                                          hgap="10.0"
+                                          prefHeight="354.0"
+                                          prefWidth="488.0"
+                                          vgap="10.0"
+                                          styleClass="movie-grid" />
+                            </content>
+                        </ScrollPane>
+                    </children>
+                </HBox>
+            </center>
+
+            <right>
+                <VBox prefHeight="325.0"
+                      prefWidth="8.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER" />
+            </right>
+
+        </BorderPane>
+    </children>
+</StackPane>

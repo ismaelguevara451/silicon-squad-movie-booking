@@ -2,6 +2,7 @@ package controllers;
 
 import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
 import com.siliconsquad.siliconsquadmoviebooking.services.UserManager;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,7 +14,6 @@ import javafx.stage.Stage;
 
 public class LoginController {
 
-    // FXML components from login page
     @FXML
     private Button registerButton;
 
@@ -29,49 +29,62 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
-    // Methods down here
     @FXML
     protected void moveToRegister() throws Exception {
-
-        //Create FXMLLoader and load the page
-        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("registerPage.fxml"));
-
-        //We set the scene or page with the loaded FXMLLoader
-        Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
-
-        //We choose the current stage from the registerbutton (can be taken from other parts of the stage)
-        Stage stage = (Stage) registerButton.getScene().getWindow();
-
-        //We replace the stage with our current scene or page
-        stage.setScene(scene);
-
-        //Display the scene or page
-        stage.show();
+        openPage("registerPage.fxml", registerButton);
     }
 
-    // Just testing for now
+    @FXML
+    protected void moveToForgotPassword() throws Exception {
+        openPage("forgotPasswordPage.fxml", forgotPasswordButton);
+    }
+
     @FXML
     protected void moveToHome() throws Exception {
+
         String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim();
+        String password = passwordField.getText();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showError("Please enter your username and password.");
+            return;
+        }
 
         UserManager manager = new UserManager();
 
         if (manager.validateLogin(username, password)) {
-            FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("mainPage.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
-
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
+            openPage("mainPage.fxml", loginButton);
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Login Failed");
-            alert.setHeaderText(null);
-            alert.setContentText("Invalid username or password.");
-            alert.showAndWait();
-
+            showError("Invalid username or password.");
             passwordField.clear();
+            passwordField.requestFocus();
         }
+    }
+
+    private void openPage(String pageName, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource(pageName)
+        );
+
+        Scene scene = new Scene(loader.load(), 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void showError(String message) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        alert.setTitle("Login Failed");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
 }

@@ -13,6 +13,10 @@ module com.siliconsquad.siliconsquadmoviebooking {
 
     opens com.siliconsquad.siliconsquadmoviebooking to javafx.fxml;
     exports com.siliconsquad.siliconsquadmoviebooking;
+
     exports controllers;
     opens controllers to javafx.fxml;
+
+    exports com.siliconsquad.siliconsquadmoviebooking.components;
+    opens com.siliconsquad.siliconsquadmoviebooking.components to javafx.fxml;
 }
