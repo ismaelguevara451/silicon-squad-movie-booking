@@ -1,0 +1,18 @@
+Matrix,A computer hacker discovers that the world he knows is a simulated reality controlled by intelligent machines.
+Avengers,Earth's greatest heroes unite to stop a powerful enemy whose plans threaten the future of the entire planet.
+Inception,A skilled thief enters people's dreams to steal secrets and is offered a chance to erase his troubled past.
+The Matrix Reloaded,Neo and his allies continue their fight as the machine army moves closer to humanity's final refuge.
+Forrest Gump,A kindhearted man experiences several major moments in history while remaining devoted to the woman he loves.
+Parasite,A struggling family slowly enters the lives of a wealthy household, leading to unexpected and dangerous consequences.
+Terminator,A relentless machine is sent from the future to eliminate the woman whose son will lead humanity's resistance.
+Gladiator,A betrayed Roman general becomes a gladiator and fights to avenge his family and restore honor to Rome.
+Jurassic Park,Scientists bring dinosaurs back to life, but a failure in the park's security system creates a fight for survival.
+Taxi Driver,A lonely New York taxi driver becomes increasingly disturbed by the violence and corruption surrounding him.
+Tarzan,A man raised in the jungle must choose between the family that raised him and the human world he has discovered.
+Rush Hour,A Hong Kong inspector and a fast-talking Los Angeles detective work together to solve a kidnapping.
+Interstellar,A team of explorers travels through a wormhole in space to search for a new home for humanity.
+The Dark Knight,Batman faces a criminal mastermind whose campaign of chaos pushes Gotham City and its heroes to their limits.
+Titanic,Two passengers from different social classes fall in love aboard the famously doomed ocean liner.
+Pulp Fiction,Several interconnected stories of crime, loyalty, and redemption unfold across the streets of Los Angeles.
+The Godfather,The youngest son of a powerful crime family is gradually drawn into the family's dangerous business.
+Goodfellas,A young man enters organized crime and experiences its wealth, loyalty, violence, and eventual collapse.

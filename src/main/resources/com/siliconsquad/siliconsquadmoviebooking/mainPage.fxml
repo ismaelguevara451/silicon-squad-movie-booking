@@ -35,6 +35,7 @@
 
                     <children>
                         <Button mnemonicParsing="false"
+                                onAction="#searchMovies"
                                 prefWidth="80.0"
                                 text="Search" />
 

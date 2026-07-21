@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+import com.siliconsquad.siliconsquadmoviebooking.services.MovieManager;
+
 
 public class MainController {
 
@@ -27,84 +29,38 @@ public class MainController {
     @FXML
     private Button logoutButton;
 
-    private final List<Movie> movies = List.of(
-            new Movie(
-                    "Matrix",
-                    "A computer hacker discovers that the world he knows is a simulated reality controlled by intelligent machines."
-            ),
-            new Movie(
-                    "Avengers",
-                    "Earth's greatest heroes unite to stop a powerful enemy whose plans threaten the future of the entire planet."
-            ),
-            new Movie(
-                    "Inception",
-                    "A skilled thief enters people's dreams to steal secrets and is offered a chance to erase his troubled past."
-            ),
-            new Movie(
-                    "The Matrix Reloaded",
-                    "Neo and his allies continue their fight as the machine army moves closer to humanity's final refuge."
-            ),
-            new Movie(
-                    "Forrest Gump",
-                    "A kindhearted man experiences several major moments in history while remaining devoted to the woman he loves."
-            ),
-            new Movie(
-                    "Parasite",
-                    "A struggling family slowly enters the lives of a wealthy household, leading to unexpected and dangerous consequences."
-            ),
-            new Movie(
-                    "Terminator",
-                    "A relentless machine is sent from the future to eliminate the woman whose son will lead humanity's resistance."
-            ),
-            new Movie(
-                    "Gladiator",
-                    "A betrayed Roman general becomes a gladiator and fights to avenge his family and restore honor to Rome."
-            ),
-            new Movie(
-                    "Jurassic Park",
-                    "Scientists bring dinosaurs back to life, but a failure in the park's security system creates a fight for survival."
-            ),
-            new Movie(
-                    "Taxi Driver",
-                    "A lonely New York taxi driver becomes increasingly disturbed by the violence and corruption surrounding him."
-            ),
-            new Movie(
-                    "Tarzan",
-                    "A man raised in the jungle must choose between the family that raised him and the human world he has discovered."
-            ),
-            new Movie(
-                    "Rush Hour",
-                    "A Hong Kong inspector and a fast-talking Los Angeles detective work together to solve a kidnapping."
-            ),
-            new Movie(
-                    "Interstellar",
-                    "A team of explorers travels through a wormhole in space to search for a new home for humanity."
-            ),
-            new Movie(
-                    "The Dark Knight",
-                    "Batman faces a criminal mastermind whose campaign of chaos pushes Gotham City and its heroes to their limits."
-            ),
-            new Movie(
-                    "Titanic",
-                    "Two passengers from different social classes fall in love aboard the famously doomed ocean liner."
-            ),
-            new Movie(
-                    "Pulp Fiction",
-                    "Several interconnected stories of crime, loyalty, and redemption unfold across the streets of Los Angeles."
-            ),
-            new Movie(
-                    "The Godfather",
-                    "The youngest son of a powerful crime family is gradually drawn into the family's dangerous business."
-            ),
-            new Movie(
-                    "Goodfellas",
-                    "A young man enters organized crime and experiences its wealth, loyalty, violence, and eventual collapse."
-            )
-    );
+    private List<Movie> movies;
+
+    private final MovieManager movieManager = new MovieManager();
 
     @FXML
-    public void initialize() throws IOException {
+        public void initialize() throws IOException {
+        movies = movieManager.loadMovies();
         showMovies(movies);
+    }
+
+    @FXML
+    private void searchMovies() {
+        String keyword = searchField.getText().trim();
+
+        try {
+            if (keyword.isEmpty()) {
+                showMovies(movies);
+            } else {
+                List<Movie> results =
+                    movieManager.searchMovies(movies, keyword);
+
+                showMovies(results);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Search Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Unable to display the search results.");
+            alert.showAndWait();
+        }
     }
 
     private void showMovies(List<Movie> movieList) throws IOException {
