@@ -1,7 +1,9 @@
 package controllers;
 
 import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
+import com.siliconsquad.siliconsquadmoviebooking.models.Auditorium;
 import com.siliconsquad.siliconsquadmoviebooking.models.Movie;
+import com.siliconsquad.siliconsquadmoviebooking.models.Showtime;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,6 +26,9 @@ public class MainController {
     private TilePane movieGrid;
 
     @FXML
+    private TilePane showtimesGrid;
+
+    @FXML
     private TextField searchField;
 
     @FXML
@@ -31,12 +36,17 @@ public class MainController {
 
     private List<Movie> movies;
 
+    private List<Showtime> showtimes;
+
     private final MovieManager movieManager = new MovieManager();
 
     @FXML
         public void initialize() throws IOException {
         movies = movieManager.loadMovies();
+        showtimes = movieManager.loadShowtimes();
+        movieManager.assignShowtimes(movies, showtimes);
         showMovies(movies);
+
     }
 
     @FXML
@@ -76,7 +86,21 @@ public class MainController {
             MovieCardController controller = loader.getController();
             controller.setMovie(movie);
 
+            card.setOnMouseClicked(event -> showShowtimes(movie));
+
             movieGrid.getChildren().add(card);
+        }
+    }
+
+    private void showShowtimes(Movie movie){
+        showtimesGrid.getChildren().clear();
+
+        for(Showtime showtimes : movie.getShowtimes()) {
+
+            Button showtimeButton = new Button(showtimes.getFormattedStartTime());
+
+            showtimesGrid.getChildren().add(showtimeButton);
+
         }
     }
 

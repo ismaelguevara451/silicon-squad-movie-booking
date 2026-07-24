@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.siliconsquad.siliconsquadmoviebooking.components.MovieBackgroundPane?>
+<?import com.siliconsquad.siliconsquadmoviebooking.components.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane maxHeight="-Infinity"
-           maxWidth="-Infinity"
-           minHeight="-Infinity"
-           minWidth="-Infinity"
-           prefHeight="400.0"
-           prefWidth="600.0"
-           styleClass="main-background"
-           stylesheets="@background.css"
-           xmlns="http://javafx.com/javafx/17.0.12"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="controllers.MainController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="main-background" stylesheets="@background.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
 
     <children>
 
@@ -26,41 +16,21 @@
         <BorderPane style="-fx-background-color: transparent;">
 
             <top>
-                <HBox alignment="CENTER"
-                      prefHeight="40.0"
-                      prefWidth="600.0"
-                      spacing="10.0"
-                      style="-fx-background-color: transparent;"
-                      BorderPane.alignment="CENTER">
+                <HBox alignment="CENTER" prefHeight="40.0" prefWidth="600.0" spacing="10.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
 
                     <children>
-                        <Button mnemonicParsing="false"
-                                onAction="#searchMovies"
-                                prefWidth="80.0"
-                                text="Search" />
+                        <Button mnemonicParsing="false" onAction="#searchMovies" prefWidth="80.0" text="Search" />
 
-                        <TextField fx:id="searchField"
-                                   prefHeight="25.0"
-                                   prefWidth="305.0"
-                                   promptText="Enter name of the movie here" />
+                        <TextField fx:id="searchField" prefHeight="25.0" prefWidth="305.0" promptText="Enter name of the movie here" />
                     </children>
                 </HBox>
             </top>
 
             <left>
-                <VBox alignment="TOP_CENTER"
-                      prefHeight="200.0"
-                      prefWidth="350.0"
-                      spacing="20.0"
-                      style="-fx-background-color: transparent;"
-                      BorderPane.alignment="CENTER">
+                <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="350.0" spacing="20.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
 
                     <children>
-                        <Button fx:id="logoutButton"
-                                mnemonicParsing="false"
-                                onAction="#logoutUser"
-                                prefWidth="80.0"
-                                text="Log out" />
+                        <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#logoutUser" prefWidth="80.0" text="Log out" />
                     </children>
 
                     <BorderPane.margin>
@@ -70,37 +40,31 @@
             </left>
 
             <center>
-                <HBox alignment="CENTER"
-                      prefHeight="100.0"
-                      prefWidth="0.0"
-                      style="-fx-background-color: transparent;"
-                      BorderPane.alignment="CENTER">
-
-                    <children>
-                        <ScrollPane fitToWidth="true"
-                                    prefHeight="200.0"
-                                    prefWidth="200.0"
-                                    styleClass="movie-scroll-pane"
-                                    HBox.hgrow="ALWAYS">
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                        <ScrollPane fitToWidth="true" maxHeight="724.0" styleClass="movie-scroll-pane">
 
                             <content>
-                                <TilePane fx:id="movieGrid"
-                                          hgap="10.0"
-                                          prefHeight="354.0"
-                                          prefWidth="488.0"
-                                          vgap="10.0"
-                                          styleClass="movie-grid" />
+                                <TilePane fx:id="movieGrid" hgap="10.0" maxHeight="724.0" styleClass="movie-grid" vgap="10.0" />
                             </content>
                         </ScrollPane>
-                    </children>
-                </HBox>
+                  <ScrollPane fitToWidth="true" layoutX="10.0" layoutY="10.0" maxWidth="1400.0" prefHeight="300.0" style="-fx-background-color: white; -fx-background-radius: 22; -fx-border-radius: 22; -fx-border-color: rgba(22,35,50,0.78);" styleClass="movie-scroll-pane">
+                     <content>
+                        <TilePane fx:id="showtimesGrid" hgap="10.0" style="-fx-background-radius: 22; -fx-border-radius: 22;" vgap="10.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding></TilePane>
+                     </content>
+                  </ScrollPane>
+               </children>
+            </VBox>
             </center>
 
             <right>
-                <VBox prefHeight="325.0"
-                      prefWidth="8.0"
-                      style="-fx-background-color: transparent;"
-                      BorderPane.alignment="CENTER" />
+                <VBox prefHeight="325.0" prefWidth="8.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER" />
             </right>
 
         </BorderPane>

@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+
 public class MovieCardController {
 
     private static final Duration HALF_FLIP_DURATION =
