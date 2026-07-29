@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.siliconsquad.siliconsquadmoviebooking.components.MovieBackgroundPane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<?import eu.hansolo.tilesfx.Tile?>
+<StackPane maxHeight="-Infinity"
+           maxWidth="-Infinity"
+           minHeight="-Infinity"
+           minWidth="-Infinity"
+           prefHeight="400.0"
+           prefWidth="600.0"
+           styleClass="main-background"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.BookingController">
+    <children>
+        <!-- White animated lines across the full blue page. -->
+        <MovieBackgroundPane />
+        <!-- Main page controls displayed above the animation. -->
+        <BorderPane styleClass="pane-padding" style="-fx-background-color: transparent;">
+                <top>
+                </top>
+                <left>
+                    <VBox
+                          style="-fx-background-color: transparent;"
+                          alignment="TOP_CENTER"
+                          prefHeight="175.0"
+                          prefWidth="200.0"
+                          spacing="20.0"
+                          BorderPane.alignment="CENTER">
+                    </VBox>
+                </left>
+                <center>
+                    <VBox style="-fx-background-color: transparent;"
+                          alignment="CENTER"
+                          prefHeight="800.0"
+                          prefWidth="200.0"
+                          BorderPane.alignment="CENTER">
+                        <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: black;">
+                            <padding>
+                                <Insets top="40"></Insets>
+                            </padding>
+                            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 20px">Forrest Gump</Label>
+                        </HBox>
+                        <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: black;">
+                            <Label fx:id="theaterLabel" styleClass="theater-info">AMC The Grove 14 | </Label>
+                            <Label fx:id="dateLabel" styleClass="theater-info">July 28, 2026 | </Label>
+                            <Label fx:id="timeLabel" styleClass="theater-info">9:00PM | </Label>
+                            <Label fx:id="ratingLabel" styleClass="theater-info">PG-13 | </Label>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;"
+                              alignment="CENTER"
+                              prefWidth="200.0">
+                            <padding>
+                                <Insets top="50.0"></Insets>
+                            </padding>
+                            <Label style="-fx-text-fill: #F2F2F2;">SCREEN</Label>
+                        </HBox>
+                        <HBox alignment="TOP_CENTER" style="-fx-background-color: black;">
+                            <Rectangle height="10.0" width="400" style="-fx-fill: gray;" ></Rectangle>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;"
+                              alignment="TOP_CENTER"
+                              prefHeight="100.0"
+                              prefWidth="50.0">
+                            <padding>
+                                <Insets top="50.0"></Insets>
+                            </padding>
+                            <TilePane prefColumns="10" minWidth="500.0" maxWidth="1200.0" hgap="10.0" vgap="10.0" alignment="CENTER">
+                                <children>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="A10"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="B10"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="C10"/>
+                                </children>
+                            </TilePane>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;"
+                              alignment="TOP_CENTER"
+                              prefHeight="300.0">
+                            <TilePane prefColumns="10" minWidth="400.0" maxWidth="1200.0" hgap="10.0" vgap="10.0" alignment="CENTER">
+                                <padding>
+                                    <Insets top="50.0"></Insets>
+                                </padding>
+                                <children>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="D10"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="E10"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="F10"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="G10"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H1"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H2"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H3"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H4"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H5"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H6"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H7"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H8"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H9"/>
+                                    <ToggleButton styleClass="seat-button" onAction="#handleSeatSelection" text="H10"/>
+                                </children>
+                            </TilePane>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;" alignment="BASELINE_CENTER">
+                            <padding>
+                                <Insets top="40.0" bottom="50.0"></Insets>
+                            </padding>
+                            <Label style="-fx-text-fill: #F2F2F2;">BACK OF THEATER</Label>
+                        </HBox>
+                    </VBox>
+                </center>
+                <right>
+                    <VBox alignment="CENTER"
+                          style="-fx-background-color: white;"
+                          maxHeight="757.5"
+                          prefWidth="300.0"
+                          spacing="20.0"
+                          BorderPane.alignment="CENTER">
+                        <HBox alignment="CENTER">
+                            <padding>
+                                <Insets left="20" bottom="20"></Insets>
+                            </padding>
+                            <Label styleClass="checkout-label">Checkout Cart</Label>
+                        </HBox>
+                        <HBox spacing="100.0">
+                            <padding>
+                              <Insets left="20" bottom="20"></Insets>
+                            </padding>
+                            <Label styleClass="seat-number-label" wrapText="false" minWidth="100.0">Seat Number(s)</Label>
+                            <Label styleClass="seat-number-value" fx:id="seatLabel" wrapText="true"></Label>
+                        </HBox>
+                        <HBox spacing="170.0">
+                            <padding>
+                                <Insets left="20"></Insets>
+                            </padding>
+                            <Label styleClass="price-label">Price</Label>
+                            <Label styleClass="price-label-value" fx:id="priceLabel"></Label>
+                        </HBox>
+                        <HBox alignment="CENTER">
+                            <padding>
+                                <Insets left="20"></Insets>
+                            </padding>
+                            <Button>Review and pay</Button>
+                        </HBox>
+                    </VBox>
+                </right>
+        </BorderPane>
+    </children>
+</StackPane>

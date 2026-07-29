@@ -34,11 +34,30 @@ public class MainController {
     @FXML
     private Button logoutButton;
 
+    @FXML
+    private Button bookingButton;
+
     private List<Movie> movies;
 
     private List<Showtime> showtimes;
 
     private final MovieManager movieManager = new MovieManager();
+
+    private void openPage(String pageName, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource(pageName)
+        );
+
+        Scene scene = new Scene(loader.load(), 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
 
     @FXML
         public void initialize() throws IOException {
@@ -47,6 +66,11 @@ public class MainController {
         movieManager.assignShowtimes(movies, showtimes);
         showMovies(movies);
 
+    }
+
+    @FXML
+    protected void moveToBooking() throws Exception{
+        openPage("bookingPage.fxml", bookingButton);
     }
 
     @FXML

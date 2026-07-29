@@ -97,3 +97,46 @@
     -fx-border-color: #1E90FF;
     -fx-border-width: 1.8;
 }
+
+.booking-top {
+    -fx-background-color: transparent;
+}
+
+.pane-padding {
+    padding: 10px 10px;
+}
+
+.theater-info {
+    -fx-text-fill: white;
+}
+
+.checkout-label {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.seat-number-label{
+    -fx-font-weight: bold;
+}
+.price-label {
+    -fx-font-weight: bold;
+}
+
+.seat-button {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 37.5px;
+    -fx-pref-height: 37.5px;
+    -fx-focus-color: transparent;
+
+}
+
+.seat-button:hover{
+    -fx-background-color: #1E90FF;
+}
+
+.seat-button:selected {
+    -fx-background-color: navy;
+    -fx-text-fill: white;
+}
+
