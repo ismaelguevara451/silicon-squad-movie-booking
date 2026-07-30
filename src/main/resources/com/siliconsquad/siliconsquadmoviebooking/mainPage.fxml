@@ -20,7 +20,6 @@
 
                     <children>
                         <Button mnemonicParsing="false" onAction="#searchMovies" prefWidth="80.0" text="Search" />
-
                         <TextField fx:id="searchField" prefHeight="25.0" prefWidth="305.0" promptText="Enter name of the movie here" />
                     </children>
                 </HBox>
@@ -32,7 +31,6 @@
                     <children>
                         <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#logoutUser" prefWidth="80.0" text="Log out" />
                     </children>
-
                     <BorderPane.margin>
                         <Insets top="20.0" />
                     </BorderPane.margin>
@@ -43,7 +41,6 @@
             <VBox BorderPane.alignment="CENTER">
                <children>
                         <ScrollPane fitToWidth="true" maxHeight="724.0" styleClass="movie-scroll-pane">
-
                             <content>
                                 <TilePane fx:id="movieGrid" hgap="10.0" maxHeight="724.0" styleClass="movie-grid" vgap="10.0" />
                             </content>

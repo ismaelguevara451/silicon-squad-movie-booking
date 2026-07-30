@@ -4,6 +4,8 @@ import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
 import com.siliconsquad.siliconsquadmoviebooking.models.Auditorium;
 import com.siliconsquad.siliconsquadmoviebooking.models.Movie;
 import com.siliconsquad.siliconsquadmoviebooking.models.Showtime;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -43,22 +45,6 @@ public class MainController {
 
     private final MovieManager movieManager = new MovieManager();
 
-    private void openPage(String pageName, Button sourceButton)
-            throws Exception {
-
-        FXMLLoader loader = new FXMLLoader(
-                BookingApplication.class.getResource(pageName)
-        );
-
-        Scene scene = new Scene(loader.load(), 1080, 800);
-
-        Stage stage =
-                (Stage) sourceButton.getScene().getWindow();
-
-        stage.setScene(scene);
-        stage.show();
-    }
-
     @FXML
         public void initialize() throws IOException {
         movies = movieManager.loadMovies();
@@ -66,11 +52,6 @@ public class MainController {
         movieManager.assignShowtimes(movies, showtimes);
         showMovies(movies);
 
-    }
-
-    @FXML
-    protected void moveToBooking() throws Exception{
-        openPage("bookingPage.fxml", bookingButton);
     }
 
     @FXML
@@ -120,12 +101,37 @@ public class MainController {
         showtimesGrid.getChildren().clear();
 
         for(Showtime showtimes : movie.getShowtimes()) {
-
             Button showtimeButton = new Button(showtimes.getFormattedStartTime());
-
+            showtimeButton.setOnMouseClicked(event -> {
+                try {
+                    openBookingPage(showtimes, showtimeButton);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
             showtimesGrid.getChildren().add(showtimeButton);
-
         }
+    }
+
+    @FXML
+    public void openBookingPage(Showtime showtimeSelected, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource("bookingPage.fxml")
+        );
+
+        Parent root = loader.load();
+        BookingController controller = loader.getController();
+        controller.initData(showtimeSelected);
+
+        Scene scene = new Scene(root, 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML
