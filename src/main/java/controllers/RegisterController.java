@@ -125,9 +125,7 @@ public class RegisterController {
             return;
         }
 
-        UserManager manager = new UserManager();
-
-        if (manager.usernameExists(username)) {
+        if (UserManager.usernameExists(username)) {
             messageLabel.setText("That username already exists.");
             usernameField.requestFocus();
             return;
@@ -140,7 +138,7 @@ public class RegisterController {
                 password
         );
 
-        manager.saveUser(user);
+        UserManager.saveUser(user);
 
         openPage("loginPage.fxml", signupButton);
     }

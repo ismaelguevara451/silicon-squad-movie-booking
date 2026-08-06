@@ -43,13 +43,11 @@ public class MainController {
 
     private List<Showtime> showtimes;
 
-    private final MovieManager movieManager = new MovieManager();
-
     @FXML
         public void initialize() throws IOException {
-        movies = movieManager.loadMovies();
-        showtimes = movieManager.loadShowtimes();
-        movieManager.assignShowtimes(movies, showtimes);
+        movies = MovieManager.loadMovies();
+        showtimes = MovieManager.loadShowtimes();
+        MovieManager.assignShowtimes(movies, showtimes);
         showMovies(movies);
 
     }
@@ -62,8 +60,7 @@ public class MainController {
             if (keyword.isEmpty()) {
                 showMovies(movies);
             } else {
-                List<Movie> results =
-                    movieManager.searchMovies(movies, keyword);
+                List<Movie> results = MovieManager.searchMovies(movies, keyword);
 
                 showMovies(results);
             }

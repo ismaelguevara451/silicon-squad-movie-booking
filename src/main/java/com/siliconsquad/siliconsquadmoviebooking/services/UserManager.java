@@ -14,14 +14,14 @@ public class UserManager {
 
     private static final String FILE_PATH = "users.txt";
 
-    public void saveUser(User user) throws IOException {
+    public static void saveUser(User user) throws IOException {
         try (FileWriter writer = new FileWriter(FILE_PATH, true)) {
             writer.write(user.toFileString());
             writer.write(System.lineSeparator());
         }
     }
 
-    public boolean validateLogin(String username, String password) {
+    public static boolean validateLogin(String username, String password) {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
 
@@ -54,7 +54,7 @@ public class UserManager {
         return false;
     }
 
-    public boolean usernameExists(String username) {
+    public static boolean usernameExists(String username) {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
 
@@ -76,7 +76,7 @@ public class UserManager {
         return false;
     }
 
-    public boolean verifyUser(String username, String dateOfBirth) {
+    public static boolean verifyUser(String username, String dateOfBirth) {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
 
@@ -101,7 +101,7 @@ public class UserManager {
         return false;
     }
 
-    public boolean updatePassword(String username, String newPassword) {
+    public static boolean updatePassword(String username, String newPassword) {
 
         List<String> lines = new ArrayList<>();
 

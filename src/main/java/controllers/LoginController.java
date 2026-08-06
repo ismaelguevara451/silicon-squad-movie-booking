@@ -50,9 +50,8 @@ public class LoginController {
             return;
         }
 
-        UserManager manager = new UserManager();
 
-        if (manager.validateLogin(username, password)) {
+        if (UserManager.validateLogin(username, password)) {
             openPage("mainPage.fxml", loginButton);
         } else {
             showError("Invalid username or password.");

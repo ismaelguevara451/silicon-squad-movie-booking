@@ -14,12 +14,12 @@ import java.util.List;
 
 public class MovieManager {
 
-    public List<Movie> loadMovies() throws IOException {
+    public static List<Movie> loadMovies() throws IOException {
 
         List<Movie> movies = new ArrayList<>();
 
         InputStream inputStream =
-                getClass().getResourceAsStream("/movies.txt");
+                MovieManager.class.getClassLoader().getResourceAsStream("movies.txt");
 
         if (inputStream == null) {
             throw new IOException("movies.txt not found.");
@@ -52,11 +52,11 @@ public class MovieManager {
         return movies;
     }
 
-    public List<Showtime> loadShowtimes() throws IOException {
+    public static List<Showtime> loadShowtimes() throws IOException {
 
         List<Showtime> showtimes = new ArrayList<>();
 
-        InputStream inputStream = getClass().getResourceAsStream("/showtimes.txt");
+        InputStream inputStream = MovieManager.class.getClassLoader().getResourceAsStream("showtimes.txt");
 
         if (inputStream == null) {
             throw new IOException("showtimes.txt not found.");
@@ -91,7 +91,7 @@ public class MovieManager {
         return showtimes;
     }
 
-    public Auditorium createAuditorium(String room){
+    public static Auditorium createAuditorium(String room){
 
         switch(room){
 
@@ -112,7 +112,7 @@ public class MovieManager {
         }
     }
 
-    public void assignShowtimes(List<Movie> movies, List<Showtime> showtimes){
+    public static void assignShowtimes(List<Movie> movies, List<Showtime> showtimes){
 
         for(Movie movie : movies){
             for(Showtime showtime: showtimes){
@@ -123,7 +123,7 @@ public class MovieManager {
         }
     }
 
-    public List<Movie> searchMovies(
+    public static List<Movie> searchMovies(
             List<Movie> movies,
             String keyword
     ) {
