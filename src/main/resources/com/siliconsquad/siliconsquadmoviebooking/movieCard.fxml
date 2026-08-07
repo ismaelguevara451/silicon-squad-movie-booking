@@ -1,133 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<StackPane fx:id="cardRoot"
-           maxHeight="225.0"
-           maxWidth="225.0"
-           minHeight="225.0"
-           minWidth="225.0"
-           prefHeight="225.0"
-           prefWidth="225.0"
-           styleClass="luxury-movie-card"
-           stylesheets="@background.css"
-           xmlns="http://javafx.com/javafx/17.0.12"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="controllers.MovieCardController">
+<StackPane
+        fx:id="cardRoot"
+        prefWidth="185.0"
+        prefHeight="275.0"
+        styleClass="professional-movie-card"
+        xmlns="http://javafx.com/javafx/17.0.12"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="controllers.MovieCardController">
 
     <children>
 
-        <!-- WHITE FRONT SIDE: MOVIE NAME ONLY -->
-        <VBox fx:id="frontSide"
-              alignment="CENTER"
-              maxHeight="225.0"
-              maxWidth="225.0"
-              minHeight="225.0"
-              minWidth="225.0"
-              prefHeight="225.0"
-              prefWidth="225.0"
-              spacing="18.0"
-              styleClass="movie-card-front"
-              style="-fx-opacity: 1;">
-
-            <children>
-                <Label text="NOW SHOWING"
-                       style="-fx-text-fill: #1E90FF;">
-
-                    <font>
-                        <Font name="System Bold"
-                              size="11.0" />
-                    </font>
-                </Label>
-
-                <Label fx:id="movieNameLabel"
-                       alignment="CENTER"
-                       maxWidth="190.0"
-                       text="Movie"
-                       textAlignment="CENTER"
-                       wrapText="true"
-                       style="-fx-text-fill: #171717;">
-
-                    <font>
-                        <Font name="System Bold"
-                              size="18.0" />
-                    </font>
-                </Label>
-
-                <Label text="Hover to view details"
-                       style="-fx-text-fill: #777777;">
-
-                    <font>
-                        <Font size="10.0" />
-                    </font>
-                </Label>
-            </children>
-        </VBox>
-
-        <!-- BLUE BACK SIDE: MOVIE NAME AND DESCRIPTION -->
-        <VBox fx:id="backSide"
-              alignment="CENTER"
-              maxHeight="225.0"
-              maxWidth="225.0"
-              minHeight="225.0"
-              minWidth="225.0"
-              prefHeight="225.0"
-              prefWidth="225.0"
-              spacing="12.0"
-              styleClass="movie-card-back"
-              visible="false"
-              managed="false">
+        <VBox
+                alignment="TOP_CENTER"
+                spacing="7.0"
+                styleClass="movie-card-content">
 
             <padding>
-                <Insets bottom="20.0"
-                        left="20.0"
-                        right="20.0"
-                        top="20.0" />
+                <Insets
+                        top="13.0"
+                        right="12.0"
+                        bottom="12.0"
+                        left="12.0"/>
             </padding>
 
             <children>
-                <Label fx:id="backMovieNameLabel"
-                       alignment="CENTER"
-                       maxWidth="185.0"
-                       text="Movie"
-                       textAlignment="CENTER"
-                       wrapText="true"
-                       style="-fx-text-fill: white;">
 
-                    <font>
-                        <Font name="System Bold"
-                              size="17.0" />
-                    </font>
-                </Label>
+                <StackPane styleClass="poster-holder">
 
-                <Region prefHeight="1.0"
-                        prefWidth="115.0"
-                        style="-fx-background-color: rgba(255,255,255,0.60);" />
+                    <children>
+                        <ImageView
+                                fx:id="posterImageView"
+                                fitWidth="108.0"
+                                fitHeight="150.0"
+                                preserveRatio="false"
+                                smooth="true"
+                                styleClass="movie-poster"/>
+                    </children>
+                </StackPane>
 
-                <Label fx:id="descriptionLabel"
-                       alignment="TOP_CENTER"
-                       maxHeight="115.0"
-                       maxWidth="185.0"
-                       text="Movie description"
-                       textAlignment="CENTER"
-                       wrapText="true"
-                       style="-fx-text-fill: white;">
+                <Label
+                        fx:id="movieNameLabel"
+                        text="Movie"
+                        wrapText="true"
+                        maxWidth="160.0"
+                        styleClass="professional-movie-title"/>
 
-                    <font>
-                        <Font size="11.5" />
-                    </font>
-                </Label>
+                <Label
+                        fx:id="descriptionLabel"
+                        text="Movie description"
+                        wrapText="true"
+                        maxWidth="160.0"
+                        maxHeight="33.0"
+                        styleClass="movie-description-preview"/>
 
-                <Label text="Move cursor away to return"
-                       style="-fx-text-fill: #DCEEFF;">
+                <Region
+                        prefHeight="3.0"
+                        VBox.vgrow="ALWAYS"/>
 
-                    <font>
-                        <Font size="9.0" />
-                    </font>
-                </Label>
+                <Label
+                        text="View showtimes"
+                        styleClass="view-showtimes-label"/>
+
             </children>
         </VBox>
 

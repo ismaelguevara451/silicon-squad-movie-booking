@@ -1,138 +1,251 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.siliconsquad.siliconsquadmoviebooking.components.MovieBackgroundPane?>
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 
-<?import eu.hansolo.tilesfx.Tile?>
-<StackPane maxHeight="-Infinity"
-           maxWidth="-Infinity"
-           minHeight="-Infinity"
-           minWidth="-Infinity"
-           prefHeight="400.0"
-           prefWidth="600.0"
-           styleClass="main-background"
-           stylesheets="@background.css"
-           xmlns="http://javafx.com/javafx/17.0.12"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="controllers.BookingController">
-    <children>
-        <!-- White animated lines across the full blue page. -->
-        <MovieBackgroundPane />
-        <!-- Main page controls displayed above the animation. -->
-        <BorderPane styleClass="pane-padding" style="-fx-background-color: transparent;">
-                <top>
-                </top>
-                <left>
-                    <VBox
-                          style="-fx-background-color: transparent;"
-                          alignment="TOP_CENTER"
-                          prefHeight="175.0"
-                          prefWidth="200.0"
-                          spacing="20.0"
-                          BorderPane.alignment="CENTER">
-                    </VBox>
-                </left>
-                <center>
-                    <VBox style="-fx-background-color: transparent;"
-                          alignment="CENTER"
-                          prefHeight="800.0"
-                          prefWidth="200.0"
-                          BorderPane.alignment="CENTER">
-                        <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: black;">
-                            <padding>
-                                <Insets top="40"></Insets>
-                            </padding>
-                            <Label fx:id="movieLabel" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 20px"></Label>
-                        </HBox>
-                        <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: black;">
-                            <Label fx:id="theaterLabel" styleClass="theater-info"></Label>
-                            <Label fx:id="dateLabel" styleClass="theater-info"></Label>
-                            <Label fx:id="timeLabel" styleClass="theater-info"></Label>
-                        </HBox>
-                        <HBox style="-fx-background-color: black;"
-                              alignment="CENTER"
-                              prefWidth="200.0">
-                            <padding>
-                                <Insets top="50.0"></Insets>
-                            </padding>
-                            <Label style="-fx-text-fill: #F2F2F2;">SCREEN</Label>
-                        </HBox>
-                        <HBox alignment="TOP_CENTER" style="-fx-background-color: black;">
-                            <Rectangle height="10.0" width="400" style="-fx-fill: gray;" ></Rectangle>
-                        </HBox>
-                        <HBox style="-fx-background-color: black;"
-                              alignment="TOP_CENTER"
-                              prefHeight="100.0"
-                              prefWidth="50.0">
-                            <padding>
-                                <Insets top="50.0"></Insets>
-                            </padding>
-                            <GridPane fx:id="frontSectionGridPane" minWidth="500.0" maxWidth="1200.0" hgap="10.0" vgap="10.0" alignment="CENTER">
-                                <children></children>
-                            </GridPane>
-                        </HBox>
-                        <HBox style="-fx-background-color: black;"
-                              alignment="TOP_CENTER"
-                              prefHeight="300.0">
-                            <GridPane fx:id="backSectionGridPane" minWidth="500.0" maxWidth="1200.0" hgap="10.0" vgap="10.0" alignment="CENTER">
-                                <padding>
-                                    <Insets top="50.0"></Insets>
-                                </padding>
-                                <children></children>
-                            </GridPane>
-                        </HBox>
-                        <HBox style="-fx-background-color: black;" alignment="BASELINE_CENTER">
-                            <padding>
-                                <Insets top="40.0" bottom="50.0"></Insets>
-                            </padding>
-                            <Label style="-fx-text-fill: #F2F2F2;">BACK OF THEATER</Label>
-                        </HBox>
-                    </VBox>
-                </center>
-                <right>
-                    <VBox alignment="CENTER"
-                          style="-fx-background-color: white;"
-                          maxHeight="757.5"
-                          prefWidth="300.0"
-                          spacing="20.0"
-                          BorderPane.alignment="CENTER">
-                        <HBox alignment="CENTER">
-                            <padding>
-                                <Insets left="20" bottom="20"></Insets>
-                            </padding>
-                            <Label styleClass="checkout-label">Checkout Cart</Label>
-                        </HBox>
-                        <HBox spacing="100.0">
-                            <padding>
-                              <Insets left="20" bottom="20"></Insets>
-                            </padding>
-                            <Label styleClass="seat-number-label" wrapText="false" minWidth="100.0">Seat Number(s)</Label>
-                            <Label styleClass="seat-number-value" fx:id="seatLabel" wrapText="true"></Label>
-                        </HBox>
-                        <HBox spacing="170.0">
-                            <padding>
-                                <Insets left="20"></Insets>
-                            </padding>
-                            <Label styleClass="price-label">Price</Label>
-                            <Label styleClass="price-label-value" fx:id="priceLabel"></Label>
-                        </HBox>
-                        <HBox alignment="CENTER">
-                            <padding>
-                                <Insets left="20"></Insets>
-                            </padding>
-                            <Button>Review and pay</Button>
-                        </HBox>
-                        <HBox alignment="CENTER">
-                            <padding>
-                                <Insets left="20"></Insets>
-                            </padding>
-                            <Button onAction="#backToMain" fx:id="backButton" text="Back"></Button>
-                        </HBox>
-                    </VBox>
-                </right>
-        </BorderPane>
-    </children>
+<StackPane
+        prefWidth="1080.0"
+        prefHeight="800.0"
+        styleClass="booking-root"
+        stylesheets="@booking.css"
+        xmlns="http://javafx.com/javafx/17.0.12"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="controllers.BookingController">
+
+    <MovieBackgroundPane/>
+
+    <HBox
+            alignment="CENTER"
+            spacing="25.0">
+
+        <padding>
+            <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
+        </padding>
+
+        <!-- Theater section -->
+        <VBox
+                alignment="TOP_CENTER"
+                spacing="12.0"
+                styleClass="theater-card"
+                HBox.hgrow="ALWAYS">
+
+            <Label
+                    fx:id="movieLabel"
+                    text="Movie"
+                    styleClass="movie-title"/>
+
+            <Label
+                    fx:id="theaterLabel"
+                    text="ROOM - TIME - DATE"
+                    styleClass="showtime-text"/>
+
+            <Region prefHeight="8.0"/>
+
+            <Label
+                    text="S C R E E N"
+                    styleClass="screen-title"/>
+
+            <StackPane
+                    prefHeight="25.0"
+                    maxWidth="720.0"
+                    styleClass="screen-holder">
+
+                <Region styleClass="screen-glow"/>
+            </StackPane>
+
+            <Region prefHeight="8.0"/>
+
+            <GridPane
+                    fx:id="frontSectionGridPane"
+                    alignment="CENTER"
+                    hgap="6.0"
+                    vgap="6.0"/>
+
+            <Region prefHeight="20.0"/>
+
+            <GridPane
+                    fx:id="backSectionGridPane"
+                    alignment="CENTER"
+                    hgap="6.0"
+                    vgap="6.0"/>
+
+            <Region prefHeight="10.0"/>
+
+            <!-- Seat legend -->
+            <HBox
+                    alignment="CENTER"
+                    spacing="75.0"
+                    styleClass="seat-legend">
+
+                <VBox
+                        alignment="CENTER"
+                        spacing="9.0"
+                        styleClass="legend-item">
+
+                    <Region prefWidth="34.0" prefHeight="31.0" minWidth="34.0" minHeight="31.0" maxWidth="34.0" maxHeight="31.0" style="-fx-background-color: linear-gradient(to bottom, white, #D7DEE7); -fx-background-radius: 7; -fx-border-color: white; -fx-border-radius: 7; -fx-border-width: 1;"/>
+                    <Label text="Available" styleClass="legend-label"/>
+                </VBox>
+
+                <VBox
+                        alignment="CENTER"
+                        spacing="9.0"
+                        styleClass="legend-item">
+
+                    <Region prefWidth="34.0" prefHeight="31.0" minWidth="34.0" minHeight="31.0" maxWidth="34.0" maxHeight="31.0" style="-fx-background-color: linear-gradient(to bottom, #35AEFF, #006DEB); -fx-background-radius: 7; -fx-border-color: #7BD4FF; -fx-border-radius: 7; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, rgba(20,148,255,0.9), 12, 0.4, 0, 2);"/>
+                    <Label text="Selected" styleClass="legend-label"/>
+                </VBox>
+
+                <VBox
+                        alignment="CENTER"
+                        spacing="9.0"
+                        styleClass="legend-item">
+
+                    <Region prefWidth="34.0" prefHeight="31.0" minWidth="34.0" minHeight="31.0" maxWidth="34.0" maxHeight="31.0" style="-fx-background-color: linear-gradient(to bottom, #FF4C59, #D80F24); -fx-background-radius: 7; -fx-border-color: #FF929A; -fx-border-radius: 7; -fx-border-width: 2;"/>
+                    <Label text="Unavailable" styleClass="legend-label"/>
+                </VBox>
+
+            </HBox>
+
+            <Label
+                    text="BACK OF THEATER"
+                    styleClass="back-theater-label"/>
+
+        </VBox>
+
+        <!-- Checkout section -->
+        <VBox
+                alignment="TOP_CENTER"
+                spacing="18.0"
+                prefWidth="320.0"
+                maxWidth="320.0"
+                styleClass="checkout-card">
+
+            <padding>
+                <Insets top="30.0" right="25.0" bottom="28.0" left="25.0"/>
+            </padding>
+
+            <ImageView
+                    fitWidth="105.0"
+                    fitHeight="105.0"
+                    preserveRatio="true"
+                    smooth="true"
+                    styleClass="checkout-logo">
+
+                <image>
+                    <Image url="@icon.png"/>
+                </image>
+            </ImageView>
+
+            <Label
+                    text="Checkout Cart"
+                    styleClass="checkout-title"/>
+
+            <Region
+                    prefHeight="1.0"
+                    maxWidth="Infinity"
+                    styleClass="checkout-divider"/>
+
+            <!-- Selected seats -->
+            <VBox
+                    alignment="TOP_LEFT"
+                    spacing="8.0"
+                    maxWidth="Infinity">
+
+                <HBox
+                        alignment="CENTER_LEFT"
+                        spacing="8.0">
+
+                    <Label
+                            text="■"
+                            styleClass="section-icon"/>
+
+                    <Label
+                            text="Selected Seats"
+                            styleClass="summary-heading"/>
+
+                    <Pane HBox.hgrow="ALWAYS"/>
+
+                    <Label
+                            fx:id="seatCountLabel"
+                            text="0 seats"
+                            styleClass="seat-count"/>
+                </HBox>
+
+                <StackPane
+                        minHeight="72.0"
+                        maxWidth="Infinity"
+                        styleClass="selected-seats-box">
+
+                    <Label
+                            fx:id="seatLabel"
+                            text="No seats selected"
+                            wrapText="true"
+                            maxWidth="245.0"
+                            styleClass="selected-seats-value"/>
+                </StackPane>
+
+            </VBox>
+
+            <!-- Total price -->
+            <VBox
+                    alignment="TOP_LEFT"
+                    spacing="8.0"
+                    maxWidth="Infinity">
+
+                <HBox
+                        alignment="CENTER_LEFT"
+                        spacing="8.0">
+
+                    <Label
+                            text="USD"
+                            styleClass="section-icon"/>
+
+                    <Label
+                            text="Total Price"
+                            styleClass="summary-heading"/>
+                </HBox>
+
+                <StackPane
+                        minHeight="72.0"
+                        maxWidth="Infinity"
+                        styleClass="total-price-box">
+
+                    <Label
+                            fx:id="priceLabel"
+                            text="0.00"
+                            styleClass="total-price-value"/>
+                </StackPane>
+
+            </VBox>
+
+            <Region
+                    prefHeight="10.0"
+                    VBox.vgrow="ALWAYS"/>
+
+            <Button
+                    fx:id="checkoutButton"
+                    text="Review and Pay"
+                    onAction="#reviewAndPay"
+                    maxWidth="Infinity"
+                    styleClass="review-button"/>
+
+            <Button
+                    fx:id="backButton"
+                    text="Back"
+                    onAction="#backToMain"
+                    maxWidth="Infinity"
+                    styleClass="booking-back-button"/>
+
+            <Label
+                    text="Secure booking"
+                    styleClass="secure-label"/>
+
+        </VBox>
+
+    </HBox>
+
 </StackPane>

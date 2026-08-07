@@ -1,0 +1,4749 @@
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\components\AnimatedLinesPane.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.components;
+
+import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
+import javafx.scene.paint.Stop;
+import javafx.scene.paint.CycleMethod;
+
+public class AnimatedLinesPane extends Pane {
+
+    private static final double RIGHT_PANEL_WIDTH = 354.0;
+
+    private final Canvas canvas = new Canvas();
+    private double animationTime = 0.0;
+
+    public AnimatedLinesPane() {
+        setMouseTransparent(true);
+        setPickOnBounds(false);
+
+        getChildren().add(canvas);
+
+        canvas.widthProperty().bind(widthProperty());
+        canvas.heightProperty().bind(heightProperty());
+
+        widthProperty().addListener((observable, oldValue, newValue) -> draw());
+        heightProperty().addListener((observable, oldValue, newValue) -> draw());
+
+        AnimationTimer timer = new AnimationTimer() {
+            private long previousTime;
+
+            @Override
+            public void handle(long now) {
+                if (previousTime == 0) {
+                    previousTime = now;
+                    return;
+                }
+
+                double seconds = (now - previousTime) / 1_000_000_000.0;
+                previousTime = now;
+
+                animationTime += seconds;
+                draw();
+            }
+        };
+
+        timer.start();
+    }
+
+    private void draw() {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        GraphicsContext graphics = canvas.getGraphicsContext2D();
+        graphics.clearRect(0, 0, width, height);
+
+        double dividerX = Math.max(0, width - RIGHT_PANEL_WIDTH);
+
+        drawPerspectiveGrid(graphics, width, height, dividerX);
+        drawFlowingLines(graphics, width, height, dividerX);
+        drawLightTrails(graphics, width, height, dividerX);
+    }
+
+    private Paint createDualColorGradient(
+            double width,
+            double dividerX,
+            double leftOpacity,
+            double rightOpacity
+    ) {
+        double transitionSize = 65.0;
+
+        double leftStop =
+                Math.max(0.0, (dividerX - transitionSize) / width);
+
+        double centerStop =
+                Math.max(0.0, Math.min(1.0, dividerX / width));
+
+        double rightStop =
+                Math.min(1.0, (dividerX + transitionSize) / width);
+
+        return new LinearGradient(
+                0,
+                0,
+                width,
+                0,
+                false,
+                CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.rgb(255, 255, 255, leftOpacity)),
+                new Stop(leftStop, Color.rgb(255, 255, 255, leftOpacity)),
+                new Stop(centerStop, Color.rgb(120, 190, 255, 0.20)),
+                new Stop(rightStop, Color.rgb(30, 144, 255, rightOpacity)),
+                new Stop(1.0, Color.rgb(30, 144, 255, rightOpacity))
+        );
+    }
+
+    private void drawPerspectiveGrid(
+            GraphicsContext graphics,
+            double width,
+            double height,
+            double dividerX
+    ) {
+        double vanishingX = width * 0.58;
+        double vanishingY = height * 0.39;
+
+        Paint gridPaint =
+                createDualColorGradient(width, dividerX, 0.17, 0.17);
+
+        graphics.setStroke(gridPaint);
+        graphics.setLineWidth(1.0);
+
+        /*
+         * Perspective lines spread from one vanishing point across the
+         * full page, so the animation visually connects both sections.
+         */
+        for (int i = -15; i <= 15; i++) {
+            double destinationX =
+                    width / 2.0 + i * width / 12.0;
+
+            graphics.strokeLine(
+                    vanishingX,
+                    vanishingY,
+                    destinationX,
+                    height + 60
+            );
+        }
+
+        /*
+         * Moving depth lines become farther apart near the bottom,
+         * producing a stronger 3D floor effect.
+         */
+        double lowerArea = height - vanishingY;
+
+        for (int i = 0; i < 18; i++) {
+            double progress =
+                    ((i * 0.075 + animationTime * 0.11) % 1.0);
+
+            double depth = progress * progress;
+            double y = vanishingY + depth * lowerArea;
+
+            double sideExpansion = depth * width * 0.60;
+
+            graphics.setLineWidth(0.7 + progress * 1.3);
+
+            graphics.strokeLine(
+                    vanishingX - sideExpansion,
+                    y,
+                    vanishingX + sideExpansion,
+                    y
+            );
+        }
+    }
+
+    private void drawFlowingLines(
+            GraphicsContext graphics,
+            double width,
+            double height,
+            double dividerX
+    ) {
+        Paint glowPaint =
+                createDualColorGradient(width, dividerX, 0.13, 0.12);
+
+        Paint corePaint =
+                createDualColorGradient(width, dividerX, 0.47, 0.33);
+
+        for (int line = 0; line < 7; line++) {
+            double baseY =
+                    height * 0.10 + line * height * 0.135;
+
+            double speed =
+                    24.0 + line * 5.0;
+
+            double phase =
+                    animationTime * speed + line * 38.0;
+
+            /*
+             * First pass creates a soft glow behind each moving line.
+             */
+            graphics.save();
+            graphics.setEffect(new GaussianBlur(7.0));
+            graphics.setStroke(glowPaint);
+            graphics.setLineWidth(5.5);
+            drawWave(graphics, width, baseY, phase, line);
+            graphics.restore();
+
+            /*
+             * Second pass draws the clear center of the same line.
+             */
+            graphics.setStroke(corePaint);
+            graphics.setLineWidth(1.35);
+            drawWave(graphics, width, baseY, phase, line);
+        }
+    }
+
+    private void drawWave(
+            GraphicsContext graphics,
+            double width,
+            double baseY,
+            double phase,
+            int lineNumber
+    ) {
+        graphics.beginPath();
+
+        for (double x = -20; x <= width + 20; x += 4) {
+            double mainWave =
+                    Math.sin((x + phase) / (70.0 + lineNumber * 8.0))
+                            * (13.0 + lineNumber * 1.3);
+
+            double detailWave =
+                    Math.cos((x - phase * 0.65) / 125.0)
+                            * 7.0;
+
+            double curve =
+                    Math.sin((x + phase * 0.30) / 240.0)
+                            * 10.0;
+
+            double y = baseY + mainWave + detailWave + curve;
+
+            if (x <= -20) {
+                graphics.moveTo(x, y);
+            } else {
+                graphics.lineTo(x, y);
+            }
+        }
+
+        graphics.stroke();
+    }
+
+    private void drawLightTrails(
+            GraphicsContext graphics,
+            double width,
+            double height,
+            double dividerX
+    ) {
+        Paint trailPaint =
+                createDualColorGradient(width, dividerX, 0.30, 0.22);
+
+        graphics.setStroke(trailPaint);
+
+        for (int trail = 0; trail < 4; trail++) {
+            double progress =
+                    (animationTime * (0.055 + trail * 0.008)
+                            + trail * 0.24) % 1.0;
+
+            double startX = -220 + progress * (width + 440);
+            double startY =
+                    height * (0.20 + trail * 0.18);
+
+            graphics.setLineWidth(1.2 + trail * 0.25);
+
+            graphics.beginPath();
+            graphics.moveTo(startX, startY);
+
+            graphics.bezierCurveTo(
+                    startX + 130,
+                    startY - 70,
+                    startX + 250,
+                    startY + 75,
+                    startX + 390,
+                    startY - 15
+            );
+
+            graphics.stroke();
+        }
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\components\MovieBackgroundPane.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.components;
+
+import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MovieBackgroundPane extends Pane {
+
+    private static final int LOGO_COUNT = 24;
+
+    private final Canvas canvas = new Canvas();
+    private final List<FloatingLogo> floatingLogos = new ArrayList<>();
+
+    private final Random random = new Random(42);
+    private final Image logoImage;
+
+    private double animationTime = 0.0;
+
+    public MovieBackgroundPane() {
+        setMouseTransparent(true);
+        setPickOnBounds(false);
+
+        logoImage = new Image(
+                MovieBackgroundPane.class.getResource(
+                        "/com/siliconsquad/siliconsquadmoviebooking/icon.png"
+                ).toExternalForm()
+        );
+
+        getChildren().add(canvas);
+
+        canvas.widthProperty().bind(widthProperty());
+        canvas.heightProperty().bind(heightProperty());
+
+        widthProperty().addListener(
+                (observable, oldValue, newValue) -> initializeLogos()
+        );
+
+        heightProperty().addListener(
+                (observable, oldValue, newValue) -> initializeLogos()
+        );
+
+        AnimationTimer timer = new AnimationTimer() {
+            private long previousTime = 0;
+
+            @Override
+            public void handle(long currentTime) {
+                if (previousTime == 0) {
+                    previousTime = currentTime;
+                    return;
+                }
+
+                double elapsedSeconds =
+                        (currentTime - previousTime)
+                                / 1_000_000_000.0;
+
+                previousTime = currentTime;
+                animationTime += elapsedSeconds;
+
+                updateLogos(elapsedSeconds);
+                drawAnimation();
+            }
+        };
+
+        timer.start();
+    }
+
+    private void initializeLogos() {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        if (!floatingLogos.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < LOGO_COUNT; i++) {
+            double size = 30 + random.nextDouble() * 34;
+
+            double speedX =
+                    randomDirection()
+                            * (7 + random.nextDouble() * 12);
+
+            double speedY =
+                    randomDirection()
+                            * (4 + random.nextDouble() * 9);
+
+            double opacity =
+                    0.07 + random.nextDouble() * 0.14;
+
+            double rotationSpeed =
+                    randomDirection()
+                            * (2 + random.nextDouble() * 8);
+
+            floatingLogos.add(
+                    new FloatingLogo(
+                            random.nextDouble() * width,
+                            random.nextDouble() * height,
+                            size,
+                            speedX,
+                            speedY,
+                            opacity,
+                            random.nextDouble() * 360,
+                            rotationSpeed,
+                            random.nextDouble() * Math.PI * 2
+                    )
+            );
+        }
+    }
+
+    private int randomDirection() {
+        return random.nextBoolean() ? 1 : -1;
+    }
+
+    private void updateLogos(double elapsedSeconds) {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+
+        for (FloatingLogo logo : floatingLogos) {
+            logo.x += logo.speedX * elapsedSeconds;
+            logo.y += logo.speedY * elapsedSeconds;
+
+            logo.rotation +=
+                    logo.rotationSpeed * elapsedSeconds;
+
+            double padding = logo.size + 20;
+
+            if (logo.x > width + padding) {
+                logo.x = -padding;
+            } else if (logo.x < -padding) {
+                logo.x = width + padding;
+            }
+
+            if (logo.y > height + padding) {
+                logo.y = -padding;
+            } else if (logo.y < -padding) {
+                logo.y = height + padding;
+            }
+        }
+    }
+
+    private void drawAnimation() {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        GraphicsContext graphics =
+                canvas.getGraphicsContext2D();
+
+        graphics.clearRect(0, 0, width, height);
+
+        drawFloatingLogos(graphics);
+        drawPerspectiveGrid(graphics, width, height);
+        drawFlowingWaves(graphics, width, height);
+        drawLightTrails(graphics, width, height);
+        drawParticles(graphics, width, height);
+    }
+
+    private void drawFloatingLogos(
+            GraphicsContext graphics
+    ) {
+        for (FloatingLogo logo : floatingLogos) {
+            double floatingOffset =
+                    Math.sin(
+                            animationTime * 0.65
+                                    + logo.floatPhase
+                    ) * 7.0;
+
+            double pulsingOpacity =
+                    logo.opacity
+                            + Math.sin(
+                            animationTime * 0.8
+                                    + logo.floatPhase
+                    ) * 0.025;
+
+            pulsingOpacity =
+                    Math.max(
+                            0.04,
+                            Math.min(0.22, pulsingOpacity)
+                    );
+
+            graphics.save();
+
+            graphics.setGlobalAlpha(pulsingOpacity);
+
+            graphics.translate(
+                    logo.x + logo.size / 2,
+                    logo.y
+                            + floatingOffset
+                            + logo.size / 2
+            );
+
+            graphics.rotate(logo.rotation);
+
+            graphics.drawImage(
+                    logoImage,
+                    -logo.size / 2,
+                    -logo.size / 2,
+                    logo.size,
+                    logo.size
+            );
+
+            graphics.restore();
+        }
+
+        graphics.setGlobalAlpha(1.0);
+    }
+
+    private void drawPerspectiveGrid(
+            GraphicsContext graphics,
+            double width,
+            double height
+    ) {
+        double vanishingX = width * 0.55;
+        double vanishingY = height * 0.38;
+
+        graphics.setStroke(
+                Color.rgb(255, 255, 255, 0.13)
+        );
+
+        graphics.setLineWidth(1.0);
+
+        for (int i = -18; i <= 18; i++) {
+            double destinationX =
+                    width / 2.0
+                            + i * width / 13.0;
+
+            graphics.strokeLine(
+                    vanishingX,
+                    vanishingY,
+                    destinationX,
+                    height + 100
+            );
+        }
+
+        double floorHeight =
+                height - vanishingY;
+
+        for (int i = 0; i < 20; i++) {
+            double progress =
+                    (i * 0.065
+                            + animationTime * 0.12)
+                            % 1.0;
+
+            double depth =
+                    progress * progress;
+
+            double y =
+                    vanishingY
+                            + depth * floorHeight;
+
+            double expansion =
+                    depth * width * 0.72;
+
+            graphics.setStroke(
+                    Color.rgb(
+                            255,
+                            255,
+                            255,
+                            0.05 + progress * 0.14
+                    )
+            );
+
+            graphics.setLineWidth(
+                    0.7 + progress * 1.5
+            );
+
+            graphics.strokeLine(
+                    vanishingX - expansion,
+                    y,
+                    vanishingX + expansion,
+                    y
+            );
+        }
+    }
+
+    private void drawFlowingWaves(
+            GraphicsContext graphics,
+            double width,
+            double height
+    ) {
+        for (int line = 0; line < 7; line++) {
+            double baseY =
+                    height * 0.08
+                            + line * height * 0.145;
+
+            double phase =
+                    animationTime
+                            * (28.0 + line * 4.0)
+                            + line * 42.0;
+
+            graphics.save();
+
+            graphics.setEffect(
+                    new GaussianBlur(8.0)
+            );
+
+            graphics.setStroke(
+                    Color.rgb(
+                            255,
+                            255,
+                            255,
+                            0.10
+                    )
+            );
+
+            graphics.setLineWidth(6.0);
+
+            drawWave(
+                    graphics,
+                    width,
+                    baseY,
+                    phase,
+                    line
+            );
+
+            graphics.restore();
+
+            graphics.setStroke(
+                    Color.rgb(
+                            255,
+                            255,
+                            255,
+                            0.34
+                    )
+            );
+
+            graphics.setLineWidth(1.35);
+
+            drawWave(
+                    graphics,
+                    width,
+                    baseY,
+                    phase,
+                    line
+            );
+        }
+    }
+
+    private void drawWave(
+            GraphicsContext graphics,
+            double width,
+            double baseY,
+            double phase,
+            int lineNumber
+    ) {
+        graphics.beginPath();
+
+        for (
+                double x = -30;
+                x <= width + 30;
+                x += 4
+        ) {
+            double firstWave =
+                    Math.sin(
+                            (x + phase)
+                                    / (
+                                    75.0
+                                            + lineNumber * 7.0
+                            )
+                    )
+                            * (
+                            12.0
+                                    + lineNumber
+                    );
+
+            double secondWave =
+                    Math.cos(
+                            (x - phase * 0.62)
+                                    / 130.0
+                    ) * 7.0;
+
+            double longCurve =
+                    Math.sin(
+                            (x + phase * 0.25)
+                                    / 250.0
+                    ) * 10.0;
+
+            double y =
+                    baseY
+                            + firstWave
+                            + secondWave
+                            + longCurve;
+
+            if (x == -30) {
+                graphics.moveTo(x, y);
+            } else {
+                graphics.lineTo(x, y);
+            }
+        }
+
+        graphics.stroke();
+    }
+
+    private void drawLightTrails(
+            GraphicsContext graphics,
+            double width,
+            double height
+    ) {
+        for (int trail = 0; trail < 5; trail++) {
+            double progress =
+                    (
+                            animationTime
+                                    * (
+                                    0.06
+                                            + trail * 0.008
+                            )
+                                    + trail * 0.21
+                    ) % 1.0;
+
+            double startX =
+                    -350
+                            + progress
+                            * (width + 700);
+
+            double startY =
+                    height
+                            * (
+                            0.15
+                                    + trail * 0.17
+                    );
+
+            graphics.save();
+
+            graphics.setEffect(
+                    new GaussianBlur(5.0)
+            );
+
+            graphics.setStroke(
+                    Color.rgb(
+                            255,
+                            255,
+                            255,
+                            0.18
+                    )
+            );
+
+            graphics.setLineWidth(3.5);
+
+            drawTrail(
+                    graphics,
+                    startX,
+                    startY
+            );
+
+            graphics.restore();
+
+            graphics.setStroke(
+                    Color.rgb(
+                            255,
+                            255,
+                            255,
+                            0.43
+                    )
+            );
+
+            graphics.setLineWidth(1.0);
+
+            drawTrail(
+                    graphics,
+                    startX,
+                    startY
+            );
+        }
+    }
+
+    private void drawTrail(
+            GraphicsContext graphics,
+            double startX,
+            double startY
+    ) {
+        graphics.beginPath();
+        graphics.moveTo(startX, startY);
+
+        graphics.bezierCurveTo(
+                startX + 140,
+                startY - 75,
+                startX + 285,
+                startY + 75,
+                startX + 450,
+                startY - 10
+        );
+
+        graphics.stroke();
+    }
+
+    private void drawParticles(
+            GraphicsContext graphics,
+            double width,
+            double height
+    ) {
+        for (int i = 0; i < 26; i++) {
+            double x =
+                    (
+                            i * 137.0
+                                    + animationTime
+                                    * (
+                                    8.0
+                                            + i % 4
+                            )
+                    ) % width;
+
+            double y =
+                    (
+                            i * 83.0
+                                    + Math.sin(
+                                    animationTime * 0.7
+                                            + i
+                            ) * 22.0
+                    ) % height;
+
+            double opacity =
+                    0.10
+                            + 0.18
+                            * (
+                            0.5
+                                    + 0.5
+                                    * Math.sin(
+                                    animationTime * 1.4
+                                            + i
+                            )
+                    );
+
+            graphics.setFill(
+                    Color.rgb(
+                            255,
+                            255,
+                            255,
+                            opacity
+                    )
+            );
+
+            graphics.fillOval(
+                    x,
+                    y,
+                    2.0 + i % 3,
+                    2.0 + i % 3
+            );
+        }
+    }
+
+    private static class FloatingLogo {
+
+        private double x;
+        private double y;
+
+        private final double size;
+        private final double speedX;
+        private final double speedY;
+        private final double opacity;
+
+        private double rotation;
+
+        private final double rotationSpeed;
+        private final double floatPhase;
+
+        private FloatingLogo(
+                double x,
+                double y,
+                double size,
+                double speedX,
+                double speedY,
+                double opacity,
+                double rotation,
+                double rotationSpeed,
+                double floatPhase
+        ) {
+            this.x = x;
+            this.y = y;
+            this.size = size;
+            this.speedX = speedX;
+            this.speedY = speedY;
+            this.opacity = opacity;
+            this.rotation = rotation;
+            this.rotationSpeed = rotationSpeed;
+            this.floatPhase = floatPhase;
+        }
+    }
+}
+
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\models\Auditorium.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.models;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+
+/**
+ * Represents an auditorium inside a movie theater, holds seat configurations
+ * and layout information.
+ */
+public class Auditorium {
+
+    /** The unique identifier for the auditorium. */
+    private int auditoriumId;
+
+    /** The name or number of the auditorium. */
+    private String name;
+
+    /** The total count of rows in the auditorium. */
+    private int numberOfRows;
+
+    /** The count of seats available in each row. */
+    private int seatsPerRow;
+
+    /** The list of all seats present in this auditorium. */
+    private final List<Seat> seats;
+
+    /**
+     * Creates a new Auditorium with specified dimensions and initializes its seats.
+     *
+     * @param auditoriumId the unique ID of the auditorium
+     * @param name the name of the auditorium
+     * @param numberOfRows the number of rows (must be greater than zero)
+     * @param seatsPerRow the number of seats per row (must be greater than zero)
+     * @throws IllegalArgumentException if rows or seats per row are less than or equal to zero
+     */
+    public Auditorium(
+            int auditoriumId,
+            String name,
+            int numberOfRows,
+            int seatsPerRow
+    ) {
+        if (numberOfRows <= 0 || seatsPerRow <= 0) {
+            throw new IllegalArgumentException(
+                    "Rows and seats per row must be greater than zero."
+            );
+        }
+
+        this.auditoriumId = auditoriumId;
+        this.name = name;
+        this.numberOfRows = numberOfRows;
+        this.seatsPerRow = seatsPerRow;
+        this.seats = new ArrayList<>();
+
+        createSeats();
+    }
+
+    /**
+     * Creates the grid of standard seats based on row and seat counts.
+     */
+    private void createSeats() {
+        seats.clear();
+
+        int seatId = 1;
+
+        for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
+            String rowLabel = convertRowNumberToLetters(rowIndex);
+
+            for (int seatNumber = 1;
+                 seatNumber <= seatsPerRow;
+                 seatNumber++) {
+
+                seats.add(
+                        new Seat(
+                                seatId,
+                                rowLabel,
+                                seatNumber,
+                                Seat.SeatType.STANDARD
+                        )
+                );
+
+                seatId++;
+            }
+        }
+    }
+
+    /**
+     * Converts a numeric row index into an alphabetical label (e.g., 0 to "A", 25 to "Z", 26 to "AA").
+     *
+     * @param rowIndex the zero-based index of the row
+     * @return the alphabetical row label string
+     */
+    private String convertRowNumberToLetters(int rowIndex) {
+        StringBuilder label = new StringBuilder();
+        int number = rowIndex;
+
+        do {
+            label.insert(0, (char) ('A' + number % 26));
+            number = number / 26 - 1;
+        } while (number >= 0);
+
+        return label.toString();
+    }
+
+    /**
+     * Returns the unique identifier of the auditorium.
+     * @return the auditorium ID
+     */
+    public int getAuditoriumId() {
+        return auditoriumId;
+    }
+
+    /**
+     * Sets the unique identifier of the auditorium.
+     * @param auditoriumId the new auditorium ID to set.
+    */
+    public void setAuditoriumId(int auditoriumId) {
+        this.auditoriumId = auditoriumId;
+    }
+
+    /**
+     * Gets the name of the auditorium.
+     * @return the auditorium name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of the auditorium.
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets the name of the auditorium.
+     * @return numbers of rows in the auditorium.
+     */
+    public int getNumberOfRows() {
+        return numberOfRows;
+    }
+
+    /**
+     * Gets the number of seats in each row.
+     * @return seats per row
+     */
+    public int getSeatsPerRow() {
+        return seatsPerRow;
+    }
+
+    /**
+     * Calculates the total capacity of the auditorium.
+     * @return total number of seats
+     */
+    public int getCapacity() {
+        return numberOfRows * seatsPerRow;
+    }
+
+    /**
+     * Gets a list of all seats in the auditorium.
+     * @return list of seats
+     */
+    public List<Seat> getSeats() {
+        return Collections.unmodifiableList(seats);
+    }
+
+    /**
+     * Finds a specific seat by its row label and seat number.
+     * @param rowLabel the row label of the seat
+     * @param seatNumber the seat number
+     * @return the matching Seat object, or null if not found
+     */
+    public Seat findSeat(String rowLabel, int seatNumber) {
+        for (Seat seat : seats) {
+            if (seat.getRowLabel().equalsIgnoreCase(rowLabel)
+                    && seat.getSeatNumber() == seatNumber) {
+                return seat;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a list of all currently available seats.
+     * @return list of available seats
+     */
+    public List<Seat> getAvailableSeats() {
+        List<Seat> availableSeats = new ArrayList<>();
+
+        for (Seat seat : seats) {
+            if (seat.isAvailable()) {
+                availableSeats.add(seat);
+            }
+        }
+
+        return availableSeats;
+    }
+
+    /**
+     * Checks if there are any available seats left.
+     * @return true if at least one seat is available, false otherwise
+     */
+    public boolean hasAvailableSeats() {
+        for (Seat seat : seats) {
+            if (seat.isAvailable()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Counts the total number of available seats.
+     * @return count of available seats
+     */
+    public int getAvailableSeatCount() {
+        return getAvailableSeats().size();
+    }
+
+    /**
+     * Resets all seats in the auditorium to an available state.
+     */
+    public void resetAllSeats() {
+        for (Seat seat : seats) {
+            seat.release();
+        }
+    }
+
+    /**
+     * Returns the capacity of the auditorium in a string format.
+     * @return a string format of the name and seat capacity
+     */
+
+    @Override
+    public String toString() {
+        return name
+                + " ("
+                + getCapacity()
+                + " seats)";
+    }
+
+    /**
+     * Compares this auditorium to another object for equality.
+     * @param object the reference object with which to compare
+     * @return true if this object is the same as the object argument; false if otherwise
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof Auditorium auditorium)) {
+            return false;
+        }
+
+        return auditoriumId == auditorium.auditoriumId;
+    }
+
+    /**
+     * Returns a hash code value for the auditorium.
+     * @return a hash code value based on the auditorium ID
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(auditoriumId);
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\models\Movie.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.models;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Represents a movie in the movie booking system.
+ * Keeps track of the movie's title, description, and scheduled showtimes.
+ */
+public class Movie {
+
+    /** The title of the movie. */
+    private String title;
+
+    /** The description of the movie. */
+    private String description;
+
+    /** The list of showtimes of the movie.  */
+    private List<Showtime> showtimes;
+
+
+    /**
+     * Constructs a Movie with a title.
+     * Sets a default placeholder message for the description.
+     * @param title the title of the movie
+     */
+    public Movie(String title) {
+        this(title, "Movie details are currently unavailable.");
+    }
+
+    /**
+     * Constructs a Movie with a title and a description.
+     * Initializes an empty list for showtimes.
+     * @param title the title of the movie
+     * @param description a short summary of the movie
+     */
+    public Movie(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.showtimes = new ArrayList<>() {
+        };
+    }
+
+    /**
+     * Constructs a Movie with a title, description, and a provided list of showtimes.
+     * @param title the title of the movie
+     * @param description the description of the movie
+     * @param showtimes the list of showtimes for the movie
+     */
+    public Movie(String title, String description, List<Showtime> showtimes) {
+        this.title = title;
+        this.description = description;
+        this.showtimes = showtimes;
+    }
+
+    /**
+     * Gets the title of the movie.
+     * @return the movie title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Sets or updates the title of the movie.
+     * @param title the new movie title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * Gets the description of the movie.
+     * @return the movie description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of the movie.
+     * @param description the new description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Adds a showtime to the movie's list of showtimes.
+     * @param showtimes the showtime to add
+     */
+    public void setShowtimes(Showtime showtimes){ this.showtimes.add(showtimes);}
+
+    /**
+     * Gets the list of showtimes for this movie.
+     * @return a list of showtimes
+     */
+    public List<Showtime> getShowtimes(){return showtimes;}
+
+    /**
+     * Returns a string representation of the movie.
+     * @return the title of the movie
+     */
+    @Override
+    public String toString() {
+        return title;
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\models\Seat.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.models;
+
+import java.util.Objects;
+
+public class Seat {
+
+    public enum SeatType {
+        STANDARD,
+        PREMIUM,
+        ACCESSIBLE
+    }
+
+    private int seatId;
+    private String rowLabel;
+    private int seatNumber;
+    private SeatType seatType;
+    private boolean reserved;
+
+    public Seat(
+            int seatId,
+            String rowLabel,
+            int seatNumber,
+            SeatType seatType
+    ) {
+        if (rowLabel == null || rowLabel.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Row label cannot be empty."
+            );
+        }
+
+        if (seatNumber <= 0) {
+            throw new IllegalArgumentException(
+                    "Seat number must be greater than zero."
+            );
+        }
+
+        this.seatId = seatId;
+        this.rowLabel = rowLabel.toUpperCase();
+        this.seatNumber = seatNumber;
+        this.seatType =
+                seatType == null ? SeatType.STANDARD : seatType;
+        this.reserved = false;
+    }
+
+    public int getSeatId() {
+        return seatId;
+    }
+
+    public void setSeatId(int seatId) {
+        this.seatId = seatId;
+    }
+
+    public String getRowLabel() {
+        return rowLabel;
+    }
+
+    public void setRowLabel(String rowLabel) {
+        if (rowLabel == null || rowLabel.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Row label cannot be empty."
+            );
+        }
+
+        this.rowLabel = rowLabel.toUpperCase();
+    }
+
+    public int getSeatNumber() {
+        return seatNumber;
+    }
+
+    public void setSeatNumber(int seatNumber) {
+        if (seatNumber <= 0) {
+            throw new IllegalArgumentException(
+                    "Seat number must be greater than zero."
+            );
+        }
+
+        this.seatNumber = seatNumber;
+    }
+
+    public SeatType getSeatType() {
+        return seatType;
+    }
+
+    public void setSeatType(SeatType seatType) {
+        this.seatType =
+                seatType == null ? SeatType.STANDARD : seatType;
+    }
+
+    public boolean isReserved() {
+        return reserved;
+    }
+
+    public boolean isAvailable() {
+        return !reserved;
+    }
+
+    public boolean reserve() {
+        if (reserved) {
+            return false;
+        }
+
+        reserved = true;
+        return true;
+    }
+
+    public void release() {
+        reserved = false;
+    }
+
+    public String getSeatLabel() {
+        return rowLabel + seatNumber;
+    }
+
+    @Override
+    public String toString() {
+        return getSeatLabel()
+                + " - "
+                + seatType
+                + (reserved ? " - Reserved" : " - Available");
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof Seat seat)) {
+            return false;
+        }
+
+        return seatId == seat.seatId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seatId);
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\models\Showtime.java
+============================================================
+
+    package com.siliconsquad.siliconsquadmoviebooking.models;
+
+    import java.time.LocalDateTime;
+    import java.time.format.DateTimeFormatter;
+    import java.util.Objects;
+
+    public class Showtime {
+
+        private int showtimeId;
+        private String movie;
+        private Auditorium auditorium;
+        private LocalDateTime startTime;
+        private double ticketPrice;
+
+        public Showtime(
+                int showtimeId,
+                String movie,
+                Auditorium auditorium,
+                LocalDateTime startTime,
+                double ticketPrice
+        ) {
+            this.showtimeId = showtimeId;
+            this.movie = movie;
+            this.auditorium = auditorium;
+            this.startTime = startTime;
+            setTicketPrice(ticketPrice);
+        }
+
+        public int getShowtimeId() {
+            return showtimeId;
+        }
+
+        public String getShowtimeMovie() {
+            return movie;
+        }
+
+        public void setShowtimeId(int showtimeId) {
+            this.showtimeId = showtimeId;
+        }
+
+        public Auditorium getAuditorium() {
+            return auditorium;
+        }
+
+        public void setAuditorium(Auditorium auditorium) {
+            this.auditorium = auditorium;
+        }
+
+        public LocalDateTime getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+        }
+
+        public double getTicketPrice() {
+            return ticketPrice;
+        }
+
+        public void setTicketPrice(double ticketPrice) {
+            if (ticketPrice < 0) {
+                throw new IllegalArgumentException(
+                        "Ticket price cannot be negative."
+                );
+            }
+
+            this.ticketPrice = ticketPrice;
+        }
+
+        public String getFormattedStartTime() {
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("EEE h:mm a - MM/dd/yyyy");
+
+            return auditorium.getName().toUpperCase()
+                + " - "
+                + startTime.format(formatter).toUpperCase();
+
+        }
+
+        public boolean hasAvailableSeats() {
+            return auditorium != null && auditorium.hasAvailableSeats();
+        }
+
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+
+            if (!(object instanceof Showtime showtime)) {
+                return false;
+            }
+
+            return showtimeId == showtime.showtimeId;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(showtimeId);
+        }
+    }
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\models\User.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.models;
+
+/**
+ * Represents a registered user account.
+ */
+public class User {
+
+    private final String name;
+    private final String username;
+    private final String dateOfBirth;
+    private final String password;
+
+    /**
+     * Creates a new user with a date of birth.
+     */
+    public User(
+            String name,
+            String username,
+            String dateOfBirth,
+            String password
+    ) {
+        this.name = name;
+        this.username = username;
+        this.dateOfBirth = dateOfBirth;
+        this.password = password;
+    }
+
+    /**
+     * Compatibility constructor for older code and older users.
+     */
+    public User(
+            String name,
+            String username,
+            String password
+    ) {
+        this(name, username, "", password);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * New users are saved as:
+     * name,username,dateOfBirth,password
+     */
+    public String toFileString() {
+        return sanitize(name)
+                + ","
+                + sanitize(username)
+                + ","
+                + sanitize(dateOfBirth)
+                + ","
+                + sanitize(password);
+    }
+
+    private String sanitize(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .trim()
+                .replace(",", "");
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\services\MovieManager.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.services;
+
+// Import the Auditorium model used to create theater rooms.
+import com.siliconsquad.siliconsquadmoviebooking.models.Auditorium;
+
+// Import the Movie model used to store movie information.
+import com.siliconsquad.siliconsquadmoviebooking.models.Movie;
+
+// Import the Showtime model used to store showing information.
+import com.siliconsquad.siliconsquadmoviebooking.models.Showtime;
+
+// Import classes used to read files.
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+// Import LocalDateTime for storing showtime dates and times.
+import java.time.LocalDateTime;
+
+// Import classes used to create and manage lists.
+import java.util.ArrayList;
+import java.util.List;
+
+// This class manages movies, showtimes, and auditoriums.
+public class MovieManager {
+
+    // This method loads movie information from the movies.txt file.
+    public static List<Movie> loadMovies() throws IOException {
+
+        // Create an empty list that will store the movies.
+        List<Movie> movies = new ArrayList<>();
+
+        // Locate and open the movies.txt file from the resources folder.
+        InputStream inputStream =
+                MovieManager.class.getClassLoader().getResourceAsStream("movies.txt");
+
+        // Check whether the movies.txt file was found.
+        if (inputStream == null) {
+
+            // Stop the method and report that the file could not be found.
+            throw new IOException("movies.txt not found.");
+        }
+
+        // Create a reader that can read text from the input stream.
+        BufferedReader reader =
+                new BufferedReader(
+                        new InputStreamReader(inputStream)
+                );
+
+        // Store each line that is read from the file.
+        String line;
+
+        // Continue reading until there are no more lines in the file.
+        while ((line = reader.readLine()) != null) {
+
+            // Split the line into two parts using the first comma.
+            String[] data = line.split(",", 2);
+
+            // Make sure the line contains the expected two values.
+            if (data.length == 2) {
+
+                // Create a Movie object using the title and movie information.
+                Movie movie = new Movie(
+                        data[0],
+                        data[1]
+                );
+
+                // Add the created movie to the movie list.
+                movies.add(movie);
+            }
+        }
+
+        // Close the file reader after all movie information has been read.
+        reader.close();
+
+        // Return the completed list of movies.
+        return movies;
+    }
+
+    // This method loads showtime information from the showtimes.txt file.
+    public static List<Showtime> loadShowtimes() throws IOException {
+
+        // Create an empty list that will store the showtimes.
+        List<Showtime> showtimes = new ArrayList<>();
+
+        // Locate and open the showtimes.txt file from the resources folder.
+        InputStream inputStream =
+                MovieManager.class.getClassLoader().getResourceAsStream("showtimes.txt");
+
+        // Check whether the showtimes.txt file was found.
+        if (inputStream == null) {
+
+            // Stop the method and report that the file could not be found.
+            throw new IOException("showtimes.txt not found.");
+        }
+
+        // Create a reader that can read text from the input stream.
+        BufferedReader reader =
+                new BufferedReader(
+                        new InputStreamReader(inputStream)
+                );
+
+        // Store each line that is read from the file.
+        String line;
+
+        // Continue reading until there are no more lines in the file.
+        while ((line = reader.readLine()) != null) {
+
+            // Split the line into five values separated by commas.
+            String[] data = line.split(",", 5);
+
+            // Make sure the line contains all five expected values.
+            if (data.length == 5) {
+
+                // Create a Showtime object using the values from the file.
+                Showtime showtime = new Showtime(
+
+                        // Convert the showtime ID from text into an integer.
+                        Integer.parseInt(data[0]),
+
+                        // Store the movie title associated with the showtime.
+                        data[1],
+
+                        // Create the correct auditorium using the room name.
+                        createAuditorium(data[2]),
+
+                        // Convert the date and time text into LocalDateTime.
+                        LocalDateTime.parse(data[3]),
+
+                        // Convert the ticket price from text into a decimal value.
+                        Double.parseDouble(data[4])
+                );
+
+                // Add the created showtime to the showtime list.
+                showtimes.add(showtime);
+            }
+        }
+
+        // Close the file reader after all showtimes have been read.
+        reader.close();
+
+        // Return the completed list of showtimes.
+        return showtimes;
+    }
+
+    // This method creates an Auditorium object based on a room name.
+    public static Auditorium createAuditorium(String room) {
+
+        // Check which room name was provided.
+        switch (room) {
+
+            // Create Room 1 with 10 rows and 10 seats per row.
+            case "Room 1":
+                return new Auditorium(1, "Room 1", 10, 10);
+
+            // Create Room 2 with 10 rows and 15 seats per row.
+            case "Room 2":
+                return new Auditorium(2, "Room 2", 10, 15);
+
+            // Create Room 3 with 10 rows and 20 seats per row.
+            case "Room 3":
+                return new Auditorium(3, "Room 3", 10, 20);
+
+            // Create Room 4 with 10 rows and 25 seats per row.
+            case "Room 4":
+                return new Auditorium(4, "Room 4", 10, 25);
+
+            // Return null when the room name does not match a known room.
+            default:
+                return null;
+        }
+    }
+
+    // This method connects each showtime to its matching movie.
+    public static void assignShowtimes(
+            List<Movie> movies,
+            List<Showtime> showtimes
+    ) {
+
+        // Loop through every movie in the movie list.
+        for (Movie movie : movies) {
+
+            // Loop through every showtime in the showtime list.
+            for (Showtime showtime : showtimes) {
+
+                // Compare the movie title with the movie title stored in the showtime.
+                if (movie.getTitle().equals(showtime.getShowtimeMovie())) {
+
+                    // Add the matching showtime to the movie.
+                    movie.setShowtimes(showtime);
+                }
+            }
+        }
+    }
+
+    // This method searches for movies whose titles contain a keyword.
+    public static List<Movie> searchMovies(
+            List<Movie> movies,
+            String keyword
+    ) {
+
+        // Create an empty list that will store matching movies.
+        List<Movie> results = new ArrayList<>();
+
+        // Loop through every movie in the provided movie list.
+        for (Movie movie : movies) {
+
+            // Convert both values to lowercase and check for a partial title match.
+            if (movie.getTitle()
+                    .toLowerCase()
+                    .contains(keyword.toLowerCase())) {
+
+                // Add the matching movie to the search results.
+                results.add(movie);
+            }
+        }
+
+        // Return all movies that matched the keyword.
+        return results;
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\services\UserManager.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking.services;
+
+// Import the User model used to store account information.
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.siliconsquad.siliconsquadmoviebooking.models.User;
+
+// This class manages user registration, login, and password operations.
+public class UserManager {
+
+    // Store the location of the file that contains user account information.
+    private static final String FILE_PATH = "users.txt";
+
+    // This method saves a new user account to users.txt.
+    public static void saveUser(User user) throws IOException {
+
+        // Open users.txt in append mode so existing accounts are not deleted.
+        try (FileWriter writer = new FileWriter(FILE_PATH, true)) {
+
+            // Convert the User object into its file-storage format and write it.
+            writer.write(user.toFileString());
+
+            // Move to a new line for the next user account.
+            writer.write(System.lineSeparator());
+        }
+    }
+
+    // This method checks whether a username and password are valid.
+    public static boolean validateLogin(
+            String username,
+            String password
+    ) {
+
+        // Open users.txt and automatically close it after reading.
+        try (BufferedReader reader =
+                     new BufferedReader(new FileReader(FILE_PATH))) {
+
+            // Store each line that is read from the file.
+            String line;
+
+            // Continue reading until there are no more user records.
+            while ((line = reader.readLine()) != null) {
+
+                // Split the user record into separate values.
+                String[] data = line.split(",");
+
+                // Handle records containing four stored values.
+                if (data.length == 4) {
+
+                    // Compare the stored username and password with the entered values.
+                    if (data[1].trim().equals(username)
+                            && data[3].trim().equals(password)) {
+
+                        // Return true when both values match.
+                        return true;
+                    }
+
+                // Handle older records containing three stored values.
+                } else if (data.length == 3) {
+
+                    // Compare the stored username and password with the entered values.
+                    if (data[1].trim().equals(username)
+                            && data[2].trim().equals(password)) {
+
+                        // Return true when both values match.
+                        return true;
+                    }
+                }
+            }
+
+        // Handle an error that occurs while reading users.txt.
+        } catch (IOException e) {
+
+            // Display an error message in the terminal.
+            System.out.println("Could not read users.txt");
+        }
+
+        // Return false when no matching account was found.
+        return false;
+    }
+
+    // This method checks whether a username is already registered.
+    public static boolean usernameExists(String username) {
+
+        // Open users.txt and automatically close it after reading.
+        try (BufferedReader reader =
+                     new BufferedReader(new FileReader(FILE_PATH))) {
+
+            // Store each line that is read from the file.
+            String line;
+
+            // Continue reading until there are no more user records.
+            while ((line = reader.readLine()) != null) {
+
+                // Split the user record into separate values.
+                String[] data = line.split(",");
+
+                // Make sure a username exists and compare it without case sensitivity.
+                if (data.length >= 2
+                        && data[1].trim().equalsIgnoreCase(username)) {
+
+                    // Return true when the username is already stored.
+                    return true;
+                }
+            }
+
+        // Ignore file-reading errors and continue to return false.
+        } catch (IOException ignored) {
+        }
+
+        // Return false when the username was not found.
+        return false;
+    }
+
+    // This method verifies a user using a username and date of birth.
+    public static boolean verifyUser(
+            String username,
+            String dateOfBirth
+    ) {
+
+        // Open users.txt and automatically close it after reading.
+        try (BufferedReader reader =
+                     new BufferedReader(new FileReader(FILE_PATH))) {
+
+            // Store each line that is read from the file.
+            String line;
+
+            // Continue reading until there are no more user records.
+            while ((line = reader.readLine()) != null) {
+
+                // Split the user record into separate values.
+                String[] data = line.split(",");
+
+                // Only check records containing four values.
+                if (data.length == 4) {
+
+                    // Compare the stored username and date of birth.
+                    if (data[1].trim().equals(username)
+                            && data[2].trim().equals(dateOfBirth)) {
+
+                        // Return true when both values match.
+                        return true;
+                    }
+                }
+            }
+
+        // Ignore file-reading errors and continue to return false.
+        } catch (IOException ignored) {
+        }
+
+        // Return false when the user's information was not verified.
+        return false;
+    }
+
+    // This method replaces a user's current password with a new password.
+    public static boolean updatePassword(
+            String username,
+            String newPassword
+    ) {
+
+        // Create a list that will temporarily store all user records.
+        List<String> lines = new ArrayList<>();
+
+        // Track whether the requested user's password was updated.
+        boolean updated = false;
+
+        // Open users.txt and automatically close it after reading.
+        try (BufferedReader reader =
+                     new BufferedReader(new FileReader(FILE_PATH))) {
+
+            // Store each line that is read from the file.
+            String line;
+
+            // Continue reading until there are no more user records.
+            while ((line = reader.readLine()) != null) {
+
+                // Split the user record into separate values.
+                String[] data = line.split(",");
+
+                // Check for a four-value record with the requested username.
+                if (data.length == 4
+                        && data[1].trim().equals(username)) {
+
+                    // Replace the stored password with the new password.
+                    data[3] = newPassword;
+
+                    // Rebuild the modified user record as one comma-separated line.
+                    line = String.join(",", data);
+
+                    // Record that the password was successfully changed.
+                    updated = true;
+                }
+
+                // Add the original or modified record to the temporary list.
+                lines.add(line);
+            }
+
+        // Return false when users.txt could not be read.
+        } catch (IOException e) {
+            return false;
+        }
+
+        // Open users.txt for rewriting and automatically close it afterward.
+        try (PrintWriter writer =
+                     new PrintWriter(new FileWriter(FILE_PATH))) {
+
+            // Loop through all user records in the temporary list.
+            for (String line : lines) {
+
+                // Write each record back into users.txt.
+                writer.println(line);
+            }
+
+        // Return false when users.txt could not be rewritten.
+        } catch (IOException e) {
+            return false;
+        }
+
+        // Return true if a password was changed, or false if no user matched.
+        return updated;
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\BookingApplication.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
+public class BookingApplication extends Application {
+    @Override
+    // Stage stage = new Stage();
+    public void start(Stage stage) throws IOException {
+
+        // Create FXMLLoader and the scene
+        FXMLLoader fxmlLoader = new FXMLLoader(BookingApplication.class.getResource("loginPage.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1080, 800);
+
+        //Create Application icon and set the icon
+        Image icon = new Image(BookingApplication.class.getResourceAsStream("icon.png"));
+        stage.getIcons().add(icon);
+
+        //Set the application title and scene
+        stage.setTitle("Movie Ticket Booking");
+        stage.setScene(scene);
+
+        //Finally show the window
+        stage.show();
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\com\siliconsquad\siliconsquadmoviebooking\Launcher.java
+============================================================
+
+package com.siliconsquad.siliconsquadmoviebooking;
+
+import javafx.application.Application;
+
+public class Launcher {
+    public static void main(String[] args) {
+        Application.launch(BookingApplication.class, args);
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\controllers\BookingController.java
+============================================================
+
+package controllers;
+
+import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+
+import java.lang.reflect.Array;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import com.siliconsquad.siliconsquadmoviebooking.models.Movie;
+import com.siliconsquad.siliconsquadmoviebooking.models.Showtime;
+import com.siliconsquad.siliconsquadmoviebooking.models.Auditorium;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+public class BookingController {
+
+    @FXML
+    private GridPane frontSectionGridPane;
+    @FXML
+    private GridPane backSectionGridPane;
+    @FXML
+    private int rows = 0;
+    @FXML
+    private int seatsPerRow = 0;
+    @FXML
+    private Label movieLabel;
+    @FXML
+    private Label theaterLabel;
+    @FXML
+    private Label dateLabel;
+    @FXML
+    private Label timeLabel;
+
+    @FXML
+    private Button backButton;
+
+    @FXML
+    private Button checkoutButton;
+    @FXML
+    private int seatQuantity;
+    @FXML
+    private Label priceLabel;
+    @FXML
+    private Label seatLabel;
+    @FXML
+    private Double ticketPrice;
+    @FXML
+    private Double customerTotal;
+    @FXML
+    private boolean takenSeat; //pull from theater seat map
+    @FXML
+    private List<String> totalSelectedSeats = new ArrayList<>();
+
+    @FXML
+    public void initData(Showtime showtimeSelected) { //set values
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        movieLabel.setText(String.valueOf(showtimeSelected.getShowtimeMovie()));
+        theaterLabel.setText(String.valueOf(showtimeSelected.getFormattedStartTime()));
+        ticketPrice = showtimeSelected.getTicketPrice();
+        rows = showtimeSelected.getAuditorium().getNumberOfRows();
+        seatsPerRow = showtimeSelected.getAuditorium().getSeatsPerRow();
+        setTilePanes();
+    }
+
+    private void setTilePanes() {
+        int asciiConverter = 65;
+
+        String seatNumber = "";
+        for (int i = 0; i < rows; i++) {
+            int asciiCode = asciiConverter + i;
+            for (int j = 0; j < seatsPerRow; j++) {
+                seatNumber = Character.toString((char) asciiCode);
+                seatNumber = (seatNumber + String.valueOf(j + 1));
+                Tooltip tooltip = new Tooltip(seatNumber);
+                tooltip.setShowDelay(Duration.ZERO);
+                ToggleButton tb = new ToggleButton(); //create Toggle button
+                tb.setUserData(seatNumber); //assign seat number
+                tb.getStyleClass().add("seat-button"); //add CSS class
+                tb.setOnAction(this::handleSeatSelection); //call method
+                tb.setTooltip(tooltip);
+                if(i < 3) {
+                    frontSectionGridPane.add(tb, j, i);
+                }
+                else{
+                    backSectionGridPane.add(tb, j, i);
+                }
+            }
+        }
+    }
+
+    @FXML
+    private void handleSeatSelection(ActionEvent event){
+        ToggleButton clickedToggleButton = (ToggleButton) event.getSource(); //gets clicked Toggle Button
+        String seatSelected = clickedToggleButton.getUserData().toString(); //get selected seat
+        String seatLabelText = "";
+
+        if (clickedToggleButton.isSelected()) { //if seat is selected
+            seatSelected(seatSelected, seatLabelText);
+        }
+        else{ //if seat is deselected
+            seatDeselected(seatSelected, seatLabelText);
+        }
+    }
+
+    @FXML
+    private void seatSelected(String seatSelected, String seatLabelText){
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); //used to format price
+        seatQuantity++; //update seat quantity
+        customerTotal = ticketPrice * seatQuantity; //update customer price in FXML
+        priceLabel.setText(currencyFormatter.format(customerTotal)); //update price label in FXML
+        totalSelectedSeats.add(seatSelected); //add current selection to selected seats list
+
+        if(totalSelectedSeats.size() == 1) {//if only one item in list, print recently added item
+            seatLabelText = seatSelected;
+            seatLabel.setText(seatLabelText);
+        }
+        else {
+            int count = 0; //used to check for initial seat
+            for(String seat : totalSelectedSeats) {
+                if (count == 0) {
+                    seatLabelText = seat;
+                    count++;
+                }
+                else {
+                    seatLabelText = seatLabelText + ", " + seat;
+                }
+            }
+        }
+        seatLabel.setText(seatLabelText);
+    }
+
+    @FXML
+    private void seatDeselected(String seatSelected, String seatLabelText){
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); //used to format price
+        seatQuantity--;
+        customerTotal = ticketPrice * seatQuantity;
+        priceLabel.setText(currencyFormatter.format(customerTotal));
+        totalSelectedSeats.remove(seatSelected);
+        if(totalSelectedSeats.isEmpty()) { //if only one item in list, print recently added item
+            seatLabel.setText("");
+        }
+        else if(totalSelectedSeats.size() == 1){
+            seatLabel.setText(seatSelected);
+        }
+        else {
+            int count = 0; //used to check for initial seat
+            for(String seat : totalSelectedSeats) {
+                if (count == 0) {
+                    seatLabelText = seat;
+                    count++;
+                }
+                else {
+                    seatLabelText = seatLabelText + ", " + seat;
+                }
+            }
+        }
+        seatLabel.setText(seatLabelText);
+    }
+
+    private void openPage(String pageName, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource(pageName)
+        );
+
+        Scene scene = new Scene(loader.load(), 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
+    protected void backToMain() throws Exception {
+        openPage("mainPage.fxml", backButton);
+    }
+
+    @FXML
+    private void checkTakenSeat(){
+        //logic needed
+    }
+
+
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\controllers\ForgotPasswordController.java
+============================================================
+
+package controllers;
+
+import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
+import com.siliconsquad.siliconsquadmoviebooking.services.UserManager;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
+
+public class ForgotPasswordController {
+
+    private static final DateTimeFormatter DOB_FORMATTER =
+            DateTimeFormatter.ofPattern("MM/dd/uuuu")
+                    .withResolverStyle(ResolverStyle.STRICT);
+
+    @FXML
+    private TextField usernameField;
+
+    @FXML
+    private TextField dateOfBirthField;
+
+    @FXML
+    private PasswordField newPasswordField;
+
+    @FXML
+    private PasswordField confirmPasswordField;
+
+    @FXML
+    private VBox resetPasswordSection;
+
+    @FXML
+    private Label messageLabel;
+
+    @FXML
+    private Button verifyButton;
+
+    @FXML
+    private Button resetPasswordButton;
+
+    @FXML
+    private Button backButton;
+
+    private String verifiedUsername;
+
+    @FXML
+    private void initialize() {
+
+        resetPasswordSection.setVisible(false);
+        resetPasswordSection.setManaged(false);
+
+        dateOfBirthField.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+
+                    String digits = newValue.replaceAll("[^0-9]", "");
+
+                    if (digits.length() > 8) {
+                        digits = digits.substring(0, 8);
+                    }
+
+                    StringBuilder formatted = new StringBuilder();
+
+                    for (int i = 0; i < digits.length(); i++) {
+
+                        if (i == 2 || i == 4) {
+                            formatted.append("/");
+                        }
+
+                        formatted.append(digits.charAt(i));
+                    }
+
+                    String result = formatted.toString();
+
+                    if (!result.equals(newValue)) {
+                        dateOfBirthField.setText(result);
+                        dateOfBirthField.positionCaret(result.length());
+                    }
+                }
+        );
+    }
+
+    @FXML
+    protected void verifyIdentity() {
+
+        String username = usernameField.getText().trim();
+        String dateOfBirth = dateOfBirthField.getText().trim();
+
+        showError("");
+
+        if (username.isEmpty() || dateOfBirth.isEmpty()) {
+            showError("Enter your username and date of birth.");
+            return;
+        }
+
+        if (!isValidDate(dateOfBirth)) {
+            showError("Enter a valid date using MM/DD/YYYY.");
+            dateOfBirthField.requestFocus();
+            return;
+        }
+
+        UserManager manager = new UserManager();
+
+        if (!manager.verifyUser(username, dateOfBirth)) {
+            showError("Username and date of birth do not match.");
+            return;
+        }
+
+        verifiedUsername = username;
+
+        messageLabel.setStyle("-fx-text-fill: #1D9A4A;");
+        messageLabel.setText("Identity successfully verified.");
+
+        usernameField.setDisable(true);
+        dateOfBirthField.setDisable(true);
+        verifyButton.setDisable(true);
+
+        resetPasswordSection.setManaged(true);
+        resetPasswordSection.setVisible(true);
+
+        newPasswordField.requestFocus();
+    }
+
+    @FXML
+    protected void resetPassword() {
+
+        String newPassword = newPasswordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+
+        showError("");
+
+        if (verifiedUsername == null) {
+            showError("Verify your identity first.");
+            return;
+        }
+
+        if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            showError("Enter and confirm your new password.");
+            return;
+        }
+
+        if (newPassword.length() < 6) {
+            showError("Password must contain at least 6 characters.");
+            newPasswordField.requestFocus();
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            showError("Passwords do not match.");
+            confirmPasswordField.clear();
+            confirmPasswordField.requestFocus();
+            return;
+        }
+
+        UserManager manager = new UserManager();
+
+        boolean updated =
+                manager.updatePassword(verifiedUsername, newPassword);
+
+        if (!updated) {
+            showError("Password could not be updated.");
+            return;
+        }
+
+        try {
+            openLoginPage();
+        } catch (Exception e) {
+            showError("Password changed, but login page could not open.");
+        }
+    }
+
+    @FXML
+    protected void backToLogin() throws Exception {
+        openLoginPage();
+    }
+
+    private boolean isValidDate(String dateOfBirth) {
+
+        try {
+            LocalDate enteredDate =
+                    LocalDate.parse(dateOfBirth, DOB_FORMATTER);
+
+            LocalDate today = LocalDate.now();
+
+            return !enteredDate.isAfter(today)
+                    && enteredDate.getYear() >= 1900;
+
+        } catch (DateTimeException e) {
+            return false;
+        }
+    }
+
+    private void openLoginPage() throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource("loginPage.fxml")
+        );
+
+        Scene scene = new Scene(loader.load(), 1080, 800);
+
+        Stage stage =
+                (Stage) backButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void showError(String message) {
+        messageLabel.setStyle("-fx-text-fill: #DD0808;");
+        messageLabel.setText(message);
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\controllers\LoginController.java
+============================================================
+
+package controllers;
+
+import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
+import com.siliconsquad.siliconsquadmoviebooking.services.UserManager;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+public class LoginController {
+
+    @FXML
+    private Button registerButton;
+
+    @FXML
+    private Button loginButton;
+
+    @FXML
+    private Button forgotPasswordButton;
+
+    @FXML
+    private TextField usernameField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    protected void moveToRegister() throws Exception {
+        openPage("registerPage.fxml", registerButton);
+    }
+
+    @FXML
+    protected void moveToForgotPassword() throws Exception {
+        openPage("forgotPasswordPage.fxml", forgotPasswordButton);
+    }
+
+    @FXML
+    protected void moveToHome() throws Exception {
+
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showError("Please enter your username and password.");
+            return;
+        }
+
+
+        if (UserManager.validateLogin(username, password)) {
+            openPage("mainPage.fxml", loginButton);
+        } else {
+            showError("Invalid username or password.");
+            passwordField.clear();
+            passwordField.requestFocus();
+        }
+    }
+
+    private void openPage(String pageName, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource(pageName)
+        );
+
+        Scene scene = new Scene(loader.load(), 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void showError(String message) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        alert.setTitle("Login Failed");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\controllers\MainController.java
+============================================================
+
+package controllers;
+
+import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
+import com.siliconsquad.siliconsquadmoviebooking.models.Auditorium;
+import com.siliconsquad.siliconsquadmoviebooking.models.Movie;
+import com.siliconsquad.siliconsquadmoviebooking.models.Showtime;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.List;
+import com.siliconsquad.siliconsquadmoviebooking.services.MovieManager;
+
+
+public class MainController {
+
+    @FXML
+    private TilePane movieGrid;
+
+    @FXML
+    private TilePane showtimesGrid;
+
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private Button logoutButton;
+
+    @FXML
+    private Button bookingButton;
+
+    private List<Movie> movies;
+
+    private List<Showtime> showtimes;
+
+    @FXML
+        public void initialize() throws IOException {
+        movies = MovieManager.loadMovies();
+        showtimes = MovieManager.loadShowtimes();
+        MovieManager.assignShowtimes(movies, showtimes);
+        showMovies(movies);
+
+    }
+
+    @FXML
+    private void searchMovies() {
+        String keyword = searchField.getText().trim();
+
+        try {
+            if (keyword.isEmpty()) {
+                showMovies(movies);
+            } else {
+                List<Movie> results = MovieManager.searchMovies(movies, keyword);
+
+                showMovies(results);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Search Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Unable to display the search results.");
+            alert.showAndWait();
+        }
+    }
+
+    private void showMovies(List<Movie> movieList) throws IOException {
+        movieGrid.getChildren().clear();
+
+        for (Movie movie : movieList) {
+            FXMLLoader loader = new FXMLLoader(
+                    BookingApplication.class.getResource("movieCard.fxml")
+            );
+
+            StackPane card = loader.load();
+
+            MovieCardController controller = loader.getController();
+            controller.setMovie(movie);
+
+            card.setOnMouseClicked(event -> showShowtimes(movie));
+
+            movieGrid.getChildren().add(card);
+        }
+    }
+
+    private void showShowtimes(Movie movie){
+        showtimesGrid.getChildren().clear();
+
+        for(Showtime showtimes : movie.getShowtimes()) {
+            Button showtimeButton = new Button(showtimes.getFormattedStartTime());
+            showtimeButton.setOnMouseClicked(event -> {
+                try {
+                    openBookingPage(showtimes, showtimeButton);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            showtimesGrid.getChildren().add(showtimeButton);
+        }
+    }
+
+    @FXML
+    public void openBookingPage(Showtime showtimeSelected, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource("bookingPage.fxml")
+        );
+
+        Parent root = loader.load();
+        BookingController controller = loader.getController();
+        controller.initData(showtimeSelected);
+
+        Scene scene = new Scene(root, 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
+    private void logoutUser() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    BookingApplication.class.getResource("loginPage.fxml")
+            );
+
+            Parent loginPage = loader.load();
+
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(loginPage));
+            stage.setTitle("Movie Ticket Booking");
+            stage.show();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Logout Successful");
+            alert.setHeaderText(null);
+            alert.setContentText("You have successfully logged out.");
+            alert.showAndWait();
+
+        } catch (IOException exception) {
+            exception.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Logout Error");
+            alert.setHeaderText(null);
+            alert.setContentText(
+                    "Unable to return to the login page."
+            );
+            alert.showAndWait();
+        }
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\controllers\MovieCardController.java
+============================================================
+
+package controllers;
+
+import com.siliconsquad.siliconsquadmoviebooking.models.Movie;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.ParallelTransition;
+import javafx.animation.PauseTransition;
+import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.fxml.FXML;
+import javafx.geometry.Point3D;
+import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
+
+
+public class MovieCardController {
+
+    private static final Duration HALF_FLIP_DURATION =
+            Duration.millis(340);
+
+    private static final Duration HOVER_DURATION =
+            Duration.millis(260);
+
+    private static final Duration RETURN_DELAY =
+            Duration.seconds(2);
+
+    @FXML
+    private StackPane cardRoot;
+
+    @FXML
+    private VBox frontSide;
+
+    @FXML
+    private VBox backSide;
+
+    @FXML
+    private Label movieNameLabel;
+
+    @FXML
+    private Label backMovieNameLabel;
+
+    @FXML
+    private Label descriptionLabel;
+
+    private final PauseTransition automaticReturn =
+            new PauseTransition(RETURN_DELAY);
+
+    private final DropShadow cardShadow =
+            new DropShadow();
+
+    private boolean showingBack = false;
+    private boolean mouseInside = false;
+    private boolean flipping = false;
+    private boolean requestedBack = false;
+
+    private Timeline currentFlip;
+    private ParallelTransition currentHoverAnimation;
+
+    @FXML
+    public void initialize() {
+        configureCard();
+        showFrontImmediately();
+
+        automaticReturn.setOnFinished(event -> {
+            if (!mouseInside) {
+                requestSide(false);
+            }
+        });
+
+        cardRoot.setOnMouseEntered(event -> {
+            mouseInside = true;
+            automaticReturn.stop();
+
+            animateHoverIn();
+            requestSide(true);
+        });
+
+        cardRoot.setOnMouseExited(event -> {
+            mouseInside = false;
+
+            animateHoverOut();
+            automaticReturn.playFromStart();
+        });
+    }
+
+    private void configureCard() {
+        cardRoot.setRotationAxis(
+                new Point3D(0, 1, 0)
+        );
+
+        cardRoot.setCache(true);
+        frontSide.setCache(true);
+        backSide.setCache(true);
+
+        cardShadow.setRadius(15);
+        cardShadow.setSpread(0.08);
+        cardShadow.setOffsetX(0);
+        cardShadow.setOffsetY(5);
+        cardShadow.setColor(
+                Color.rgb(0, 55, 110, 0.24)
+        );
+
+        cardRoot.setEffect(cardShadow);
+    }
+
+    public void setMovie(Movie movie) {
+        if (movie == null) {
+            return;
+        }
+
+        movieNameLabel.setText(movie.getTitle());
+        backMovieNameLabel.setText(movie.getTitle());
+        descriptionLabel.setText(movie.getDescription());
+
+        showFrontImmediately();
+    }
+
+    public void setMovieName(String movieName) {
+        movieNameLabel.setText(movieName);
+        backMovieNameLabel.setText(movieName);
+    }
+
+    private void requestSide(boolean displayBack) {
+        requestedBack = displayBack;
+
+        if (flipping) {
+            return;
+        }
+
+        if (requestedBack == showingBack) {
+            return;
+        }
+
+        startFlip(requestedBack);
+    }
+
+    private void startFlip(boolean displayBack) {
+        flipping = true;
+
+        if (currentFlip != null) {
+            currentFlip.stop();
+        }
+
+        double startingAngle = cardRoot.getRotate();
+
+        Timeline closeHalf = new Timeline(
+                new KeyFrame(
+                        Duration.ZERO,
+
+                        new KeyValue(
+                                cardRoot.rotateProperty(),
+                                startingAngle,
+                                Interpolator.EASE_BOTH
+                        ),
+
+                        new KeyValue(
+                                cardRoot.scaleXProperty(),
+                                cardRoot.getScaleX(),
+                                Interpolator.EASE_BOTH
+                        ),
+
+                        new KeyValue(
+                                cardRoot.scaleYProperty(),
+                                cardRoot.getScaleY(),
+                                Interpolator.EASE_BOTH
+                        )
+                ),
+
+                new KeyFrame(
+                        HALF_FLIP_DURATION,
+
+                        new KeyValue(
+                                cardRoot.rotateProperty(),
+                                90,
+                                Interpolator.SPLINE(
+                                        0.42,
+                                        0.0,
+                                        0.58,
+                                        1.0
+                                )
+                        ),
+
+                        new KeyValue(
+                                cardRoot.scaleXProperty(),
+                                1.035,
+                                Interpolator.EASE_BOTH
+                        ),
+
+                        new KeyValue(
+                                cardRoot.scaleYProperty(),
+                                0.985,
+                                Interpolator.EASE_BOTH
+                        )
+                )
+        );
+
+        closeHalf.setOnFinished(event -> {
+            if (displayBack) {
+                showBackImmediately();
+                cardRoot.setRotate(-90);
+            } else {
+                showFrontImmediately();
+                cardRoot.setRotate(90);
+            }
+
+            Timeline openHalf = new Timeline(
+                    new KeyFrame(
+                            Duration.ZERO,
+
+                            new KeyValue(
+                                    cardRoot.rotateProperty(),
+                                    cardRoot.getRotate()
+                            ),
+
+                            new KeyValue(
+                                    cardRoot.scaleXProperty(),
+                                    1.035
+                            ),
+
+                            new KeyValue(
+                                    cardRoot.scaleYProperty(),
+                                    0.985
+                            )
+                    ),
+
+                    new KeyFrame(
+                            HALF_FLIP_DURATION,
+
+                            new KeyValue(
+                                    cardRoot.rotateProperty(),
+                                    0,
+                                    Interpolator.SPLINE(
+                                            0.16,
+                                            1.0,
+                                            0.30,
+                                            1.0
+                                    )
+                            ),
+
+                            new KeyValue(
+                                    cardRoot.scaleXProperty(),
+                                    mouseInside ? 1.025 : 1.0,
+                                    Interpolator.EASE_OUT
+                            ),
+
+                            new KeyValue(
+                                    cardRoot.scaleYProperty(),
+                                    mouseInside ? 1.025 : 1.0,
+                                    Interpolator.EASE_OUT
+                            )
+                    )
+            );
+
+            openHalf.setOnFinished(finished -> {
+                cardRoot.setRotate(0);
+                flipping = false;
+
+                if (requestedBack != showingBack) {
+                    startFlip(requestedBack);
+                    return;
+                }
+
+                if (!mouseInside && showingBack) {
+                    automaticReturn.playFromStart();
+                }
+            });
+
+            currentFlip = openHalf;
+            openHalf.play();
+        });
+
+        currentFlip = closeHalf;
+        closeHalf.play();
+    }
+
+    private void animateHoverIn() {
+        stopHoverAnimation();
+
+        ScaleTransition scale =
+                new ScaleTransition(
+                        HOVER_DURATION,
+                        cardRoot
+                );
+
+        scale.setToX(1.025);
+        scale.setToY(1.025);
+        scale.setInterpolator(
+                Interpolator.SPLINE(
+                        0.16,
+                        1.0,
+                        0.30,
+                        1.0
+                )
+        );
+
+        TranslateTransition lift =
+                new TranslateTransition(
+                        HOVER_DURATION,
+                        cardRoot
+                );
+
+        lift.setToY(-6);
+        lift.setInterpolator(
+                Interpolator.EASE_OUT
+        );
+
+        Timeline shadowAnimation =
+                new Timeline(
+                        new KeyFrame(
+                                HOVER_DURATION,
+
+                                new KeyValue(
+                                        cardShadow.radiusProperty(),
+                                        24,
+                                        Interpolator.EASE_OUT
+                                ),
+
+                                new KeyValue(
+                                        cardShadow.offsetYProperty(),
+                                        11,
+                                        Interpolator.EASE_OUT
+                                ),
+
+                                new KeyValue(
+                                        cardShadow.spreadProperty(),
+                                        0.13,
+                                        Interpolator.EASE_OUT
+                                ),
+
+                                new KeyValue(
+                                        cardShadow.colorProperty(),
+                                        Color.rgb(
+                                                0,
+                                                75,
+                                                155,
+                                                0.36
+                                        ),
+                                        Interpolator.EASE_OUT
+                                )
+                        )
+                );
+
+        currentHoverAnimation =
+                new ParallelTransition(
+                        scale,
+                        lift,
+                        shadowAnimation
+                );
+
+        currentHoverAnimation.play();
+    }
+
+    private void animateHoverOut() {
+        stopHoverAnimation();
+
+        ScaleTransition scale =
+                new ScaleTransition(
+                        HOVER_DURATION,
+                        cardRoot
+                );
+
+        scale.setToX(1.0);
+        scale.setToY(1.0);
+        scale.setInterpolator(
+                Interpolator.SPLINE(
+                        0.22,
+                        1.0,
+                        0.36,
+                        1.0
+                )
+        );
+
+        TranslateTransition lower =
+                new TranslateTransition(
+                        HOVER_DURATION,
+                        cardRoot
+                );
+
+        lower.setToY(0);
+        lower.setInterpolator(
+                Interpolator.EASE_OUT
+        );
+
+        Timeline shadowAnimation =
+                new Timeline(
+                        new KeyFrame(
+                                HOVER_DURATION,
+
+                                new KeyValue(
+                                        cardShadow.radiusProperty(),
+                                        15,
+                                        Interpolator.EASE_OUT
+                                ),
+
+                                new KeyValue(
+                                        cardShadow.offsetYProperty(),
+                                        5,
+                                        Interpolator.EASE_OUT
+                                ),
+
+                                new KeyValue(
+                                        cardShadow.spreadProperty(),
+                                        0.08,
+                                        Interpolator.EASE_OUT
+                                ),
+
+                                new KeyValue(
+                                        cardShadow.colorProperty(),
+                                        Color.rgb(
+                                                0,
+                                                55,
+                                                110,
+                                                0.24
+                                        ),
+                                        Interpolator.EASE_OUT
+                                )
+                        )
+                );
+
+        currentHoverAnimation =
+                new ParallelTransition(
+                        scale,
+                        lower,
+                        shadowAnimation
+                );
+
+        currentHoverAnimation.play();
+    }
+
+    private void stopHoverAnimation() {
+        if (currentHoverAnimation != null) {
+            currentHoverAnimation.stop();
+        }
+    }
+
+    private void showFrontImmediately() {
+        showingBack = false;
+
+        frontSide.setManaged(true);
+        frontSide.setVisible(true);
+        frontSide.setOpacity(1);
+
+        backSide.setManaged(false);
+        backSide.setVisible(false);
+        backSide.setOpacity(0);
+    }
+
+    private void showBackImmediately() {
+        showingBack = true;
+
+        frontSide.setManaged(false);
+        frontSide.setVisible(false);
+        frontSide.setOpacity(0);
+
+        backSide.setManaged(true);
+        backSide.setVisible(true);
+        backSide.setOpacity(1);
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\controllers\RegisterController.java
+============================================================
+
+package controllers;
+
+import com.siliconsquad.siliconsquadmoviebooking.BookingApplication;
+import com.siliconsquad.siliconsquadmoviebooking.models.User;
+import com.siliconsquad.siliconsquadmoviebooking.services.UserManager;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
+
+public class RegisterController {
+
+    private static final DateTimeFormatter DOB_FORMATTER =
+            DateTimeFormatter.ofPattern("MM/dd/uuuu")
+                    .withResolverStyle(ResolverStyle.STRICT);
+
+    @FXML
+    private Button backbutton;
+
+    @FXML
+    private Button signupButton;
+
+    @FXML
+    private TextField nameField;
+
+    @FXML
+    private TextField usernameField;
+
+    @FXML
+    private TextField dateOfBirthField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private PasswordField confirmPasswordField;
+
+    @FXML
+    private Label messageLabel;
+
+    @FXML
+    private void initialize() {
+        dateOfBirthField.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+
+                    String digits = newValue.replaceAll("[^0-9]", "");
+
+                    if (digits.length() > 8) {
+                        digits = digits.substring(0, 8);
+                    }
+
+                    StringBuilder formatted = new StringBuilder();
+
+                    for (int i = 0; i < digits.length(); i++) {
+
+                        if (i == 2 || i == 4) {
+                            formatted.append("/");
+                        }
+
+                        formatted.append(digits.charAt(i));
+                    }
+
+                    String formattedText = formatted.toString();
+
+                    if (!formattedText.equals(newValue)) {
+                        dateOfBirthField.setText(formattedText);
+                        dateOfBirthField.positionCaret(formattedText.length());
+                    }
+                }
+        );
+    }
+
+    @FXML
+    protected void backToMain() throws Exception {
+        openPage("loginPage.fxml", backbutton);
+    }
+
+    @FXML
+    protected void signupUser() throws Exception {
+
+        String name = nameField.getText().trim();
+        String username = usernameField.getText().trim();
+        String dateOfBirth = dateOfBirthField.getText().trim();
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+
+        messageLabel.setStyle("-fx-text-fill: #DD0808;");
+
+        if (name.isEmpty()
+                || username.isEmpty()
+                || dateOfBirth.isEmpty()
+                || password.isEmpty()
+                || confirmPassword.isEmpty()) {
+
+            messageLabel.setText("Please complete every field.");
+            return;
+        }
+
+        if (!isValidDate(dateOfBirth)) {
+            messageLabel.setText("Enter a valid date using MM/DD/YYYY.");
+            dateOfBirthField.requestFocus();
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            messageLabel.setText("Passwords do not match.");
+            confirmPasswordField.clear();
+            confirmPasswordField.requestFocus();
+            return;
+        }
+
+        if (password.length() < 6) {
+            messageLabel.setText("Password must contain at least 6 characters.");
+            passwordField.requestFocus();
+            return;
+        }
+
+        if (UserManager.usernameExists(username)) {
+            messageLabel.setText("That username already exists.");
+            usernameField.requestFocus();
+            return;
+        }
+
+        User user = new User(
+                name,
+                username,
+                dateOfBirth,
+                password
+        );
+
+        UserManager.saveUser(user);
+
+        openPage("loginPage.fxml", signupButton);
+    }
+
+    private boolean isValidDate(String dateOfBirth) {
+        try {
+            LocalDate enteredDate =
+                    LocalDate.parse(dateOfBirth, DOB_FORMATTER);
+
+            LocalDate today = LocalDate.now();
+
+            return !enteredDate.isAfter(today)
+                    && enteredDate.getYear() >= 1900;
+
+        } catch (DateTimeException e) {
+            return false;
+        }
+    }
+
+    private void openPage(String pageName, Button sourceButton)
+            throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+                BookingApplication.class.getResource(pageName)
+        );
+
+        Scene scene = new Scene(loader.load(), 1080, 800);
+
+        Stage stage =
+                (Stage) sourceButton.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.show();
+    }
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\java\module-info.java
+============================================================
+
+module com.siliconsquad.siliconsquadmoviebooking {
+    requires javafx.controls;
+    requires javafx.fxml;
+    requires javafx.web;
+
+    requires org.controlsfx.controls;
+    requires com.dlsc.formsfx;
+    requires net.synedra.validatorfx;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.bootstrapfx.core;
+    requires eu.hansolo.tilesfx;
+    requires com.almasb.fxgl.all;
+
+    opens com.siliconsquad.siliconsquadmoviebooking to javafx.fxml;
+    exports com.siliconsquad.siliconsquadmoviebooking;
+
+    exports controllers;
+    opens controllers to javafx.fxml;
+
+    exports com.siliconsquad.siliconsquadmoviebooking.components;
+    opens com.siliconsquad.siliconsquadmoviebooking.components to javafx.fxml;
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\background.css
+============================================================
+
+.main-background{
+    -fx-background-image:url('BG.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+}
+
+.gray-transparent-fill{
+    -fx-background-color: rgba(0,0,0, 0.5);
+}
+
+.button{
+    -fx-background-color: #1E90FF;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-text-fill: white;
+}
+
+.button:hover{
+    -fx-opacity: 0.8;
+}
+
+.button:pressed{
+    -fx-background-color: derive(#1E90FF, -20%);
+}
+
+/* Transparent movie-list area so the animated blue background is visible. */
+.movie-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.movie-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.movie-scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
+
+.movie-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: rgba(255, 255, 255, 0.20);
+}
+
+.movie-scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 10;
+}
+
+.movie-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.70);
+    -fx-background-radius: 10;
+}
+
+.movie-grid {
+    -fx-background-color: transparent;
+}
+
+/* Luxury movie-card design */
+
+.luxury-movie-card {
+    -fx-background-color: transparent;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-cursor: hand;
+}
+
+.movie-card-front {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            rgba(255,255,255,1.0),
+            rgba(244,248,252,1.0)
+        );
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(22,35,50,0.78);
+    -fx-border-width: 1.35;
+}
+
+.movie-card-back {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #0A3D72,
+            #1267B1,
+            #1E90FF
+        );
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(255,255,255,0.75);
+    -fx-border-width: 1.3;
+}
+
+.movie-card-front:hover {
+    -fx-border-color: #1E90FF;
+    -fx-border-width: 1.8;
+}
+
+.booking-top {
+    -fx-background-color: transparent;
+}
+
+.pane-padding {
+    padding: 10px 10px;
+}
+
+.theater-info {
+    -fx-text-fill: white;
+}
+
+.checkout-label {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.seat-number-label{
+    -fx-font-weight: bold;
+}
+.price-label {
+    -fx-font-weight: bold;
+}
+
+.seat-button {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 37.5px;
+    -fx-pref-height: 37.5px;
+    -fx-focus-color: transparent;
+
+}
+
+.seat-button:hover{
+    -fx-background-color: #1E90FF;
+}
+
+.seat-button:selected {
+    -fx-background-color: navy;
+    -fx-text-fill: white;
+}
+
+.tooltip {
+    -fx-font-size: 16px;
+    -fx-padding: 8px;
+}
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\bookingPage.fxml
+============================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.siliconsquad.siliconsquadmoviebooking.components.MovieBackgroundPane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<?import eu.hansolo.tilesfx.Tile?>
+<StackPane maxHeight="-Infinity"
+           maxWidth="-Infinity"
+           minHeight="-Infinity"
+           minWidth="-Infinity"
+           prefHeight="400.0"
+           prefWidth="600.0"
+           styleClass="main-background"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.BookingController">
+    <children>
+        <!-- White animated lines across the full blue page. -->
+        <MovieBackgroundPane />
+        <!-- Main page controls displayed above the animation. -->
+        <BorderPane styleClass="pane-padding" style="-fx-background-color: transparent;">
+                <top>
+                </top>
+                <left>
+                    <VBox
+                          style="-fx-background-color: transparent;"
+                          alignment="TOP_CENTER"
+                          prefHeight="175.0"
+                          prefWidth="200.0"
+                          spacing="20.0"
+                          BorderPane.alignment="CENTER">
+                    </VBox>
+                </left>
+                <center>
+                    <VBox style="-fx-background-color: transparent;"
+                          alignment="CENTER"
+                          prefHeight="800.0"
+                          prefWidth="200.0"
+                          BorderPane.alignment="CENTER">
+                        <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: black;">
+                            <padding>
+                                <Insets top="40"></Insets>
+                            </padding>
+                            <Label fx:id="movieLabel" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 20px"></Label>
+                        </HBox>
+                        <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: black;">
+                            <Label fx:id="theaterLabel" styleClass="theater-info"></Label>
+                            <Label fx:id="dateLabel" styleClass="theater-info"></Label>
+                            <Label fx:id="timeLabel" styleClass="theater-info"></Label>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;"
+                              alignment="CENTER"
+                              prefWidth="200.0">
+                            <padding>
+                                <Insets top="50.0"></Insets>
+                            </padding>
+                            <Label style="-fx-text-fill: #F2F2F2;">SCREEN</Label>
+                        </HBox>
+                        <HBox alignment="TOP_CENTER" style="-fx-background-color: black;">
+                            <Rectangle height="10.0" width="400" style="-fx-fill: gray;" ></Rectangle>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;"
+                              alignment="TOP_CENTER"
+                              prefHeight="100.0"
+                              prefWidth="50.0">
+                            <padding>
+                                <Insets top="50.0"></Insets>
+                            </padding>
+                            <GridPane fx:id="frontSectionGridPane" minWidth="500.0" maxWidth="1200.0" hgap="10.0" vgap="10.0" alignment="CENTER">
+                                <children></children>
+                            </GridPane>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;"
+                              alignment="TOP_CENTER"
+                              prefHeight="300.0">
+                            <GridPane fx:id="backSectionGridPane" minWidth="500.0" maxWidth="1200.0" hgap="10.0" vgap="10.0" alignment="CENTER">
+                                <padding>
+                                    <Insets top="50.0"></Insets>
+                                </padding>
+                                <children></children>
+                            </GridPane>
+                        </HBox>
+                        <HBox style="-fx-background-color: black;" alignment="BASELINE_CENTER">
+                            <padding>
+                                <Insets top="40.0" bottom="50.0"></Insets>
+                            </padding>
+                            <Label style="-fx-text-fill: #F2F2F2;">BACK OF THEATER</Label>
+                        </HBox>
+                    </VBox>
+                </center>
+                <right>
+                    <VBox alignment="CENTER"
+                          style="-fx-background-color: white;"
+                          maxHeight="757.5"
+                          prefWidth="300.0"
+                          spacing="20.0"
+                          BorderPane.alignment="CENTER">
+                        <HBox alignment="CENTER">
+                            <padding>
+                                <Insets left="20" bottom="20"></Insets>
+                            </padding>
+                            <Label styleClass="checkout-label">Checkout Cart</Label>
+                        </HBox>
+                        <HBox spacing="100.0">
+                            <padding>
+                              <Insets left="20" bottom="20"></Insets>
+                            </padding>
+                            <Label styleClass="seat-number-label" wrapText="false" minWidth="100.0">Seat Number(s)</Label>
+                            <Label styleClass="seat-number-value" fx:id="seatLabel" wrapText="true"></Label>
+                        </HBox>
+                        <HBox spacing="170.0">
+                            <padding>
+                                <Insets left="20"></Insets>
+                            </padding>
+                            <Label styleClass="price-label">Price</Label>
+                            <Label styleClass="price-label-value" fx:id="priceLabel"></Label>
+                        </HBox>
+                        <HBox alignment="CENTER">
+                            <padding>
+                                <Insets left="20"></Insets>
+                            </padding>
+                            <Button>Review and pay</Button>
+                        </HBox>
+                        <HBox alignment="CENTER">
+                            <padding>
+                                <Insets left="20"></Insets>
+                            </padding>
+                            <Button onAction="#backToMain" fx:id="backButton" text="Back"></Button>
+                        </HBox>
+                    </VBox>
+                </right>
+        </BorderPane>
+    </children>
+</StackPane>
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\forgotPasswordPage.fxml
+============================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.siliconsquad.siliconsquadmoviebooking.components.AnimatedLinesPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity"
+           maxWidth="-Infinity"
+           minHeight="-Infinity"
+           minWidth="-Infinity"
+           prefHeight="400.0"
+           prefWidth="600.0"
+           styleClass="main-background"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.ForgotPasswordController">
+
+    <children>
+
+        <Pane maxWidth="430.0"
+              prefWidth="430.0"
+              StackPane.alignment="CENTER_RIGHT"
+              style="-fx-background-color: linear-gradient(to right,
+                     rgba(255,255,255,0.00) 0%,
+                     rgba(255,255,255,0.55) 9%,
+                     rgba(255,255,255,0.92) 20%,
+                     white 32%,
+                     white 100%);" />
+
+        <AnimatedLinesPane />
+
+        <BorderPane style="-fx-background-color: transparent;">
+
+            <left>
+                <VBox alignment="CENTER"
+                      prefHeight="400.0"
+                      prefWidth="247.0"
+                      spacing="18.0"
+                      BorderPane.alignment="CENTER">
+
+                    <children>
+                        <ImageView fitHeight="215.0"
+                                   fitWidth="215.0"
+                                   preserveRatio="true"
+                                   smooth="true">
+                            <image>
+                                <Image url="@icon.png" />
+                            </image>
+                        </ImageView>
+
+                        <Label alignment="CENTER"
+                               text="Remembered your password?"
+                               textAlignment="CENTER"
+                               textFill="WHITE">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+
+                        <Button fx:id="backButton"
+                                mnemonicParsing="false"
+                                onAction="#backToLogin"
+                                prefHeight="34.0"
+                                prefWidth="140.0"
+                                text="Back to Login"
+                                textFill="WHITE" />
+                    </children>
+                </VBox>
+            </left>
+
+            <right>
+                <VBox alignment="CENTER"
+                      maxWidth="410.0"
+                      prefHeight="400.0"
+                      prefWidth="410.0"
+                      spacing="10.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER">
+
+                    <padding>
+                        <Insets bottom="20.0"
+                                left="45.0"
+                                right="30.0"
+                                top="20.0" />
+                    </padding>
+
+                    <children>
+
+                        <Label text="RESET PASSWORD"
+                               textFill="#1E90FF">
+                            <font>
+                                <Font name="System Bold"
+                                      size="26.0" />
+                            </font>
+                        </Label>
+
+                        <Label text="Verify your account information"
+                               textFill="#777777">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <Label fx:id="messageLabel"
+                               alignment="CENTER"
+                               maxWidth="280.0"
+                               textAlignment="CENTER"
+                               textFill="#DD0808"
+                               wrapText="true">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Label>
+
+                        <VBox maxWidth="280.0"
+                              spacing="4.0">
+
+                            <children>
+                                <Label text="Username"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <TextField fx:id="usernameField"
+                                           prefHeight="36.0"
+                                           promptText="Enter your username"
+                                           style="-fx-background-color: rgba(255,255,255,0.96);
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-radius: 10;
+                                                  -fx-border-color: #CFCFCF;
+                                                  -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="280.0"
+                              spacing="4.0">
+
+                            <children>
+                                <Label text="Date of Birth"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <TextField fx:id="dateOfBirthField"
+                                           prefHeight="36.0"
+                                           promptText="MM/DD/YYYY"
+                                           style="-fx-background-color: rgba(255,255,255,0.96);
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-radius: 10;
+                                                  -fx-border-color: #CFCFCF;
+                                                  -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <Button fx:id="verifyButton"
+                                maxWidth="280.0"
+                                mnemonicParsing="false"
+                                onAction="#verifyIdentity"
+                                prefHeight="38.0"
+                                text="Verify Identity"
+                                textFill="WHITE">
+                            <font>
+                                <Font name="System Bold"
+                                      size="14.0" />
+                            </font>
+                        </Button>
+
+                        <VBox fx:id="resetPasswordSection"
+                              alignment="CENTER"
+                              maxWidth="280.0"
+                              spacing="8.0">
+
+                            <children>
+
+                                <VBox maxWidth="280.0"
+                                      spacing="4.0">
+
+                                    <children>
+                                        <Label text="New Password"
+                                               textFill="#333333">
+                                            <font>
+                                                <Font name="System Bold"
+                                                      size="12.0" />
+                                            </font>
+                                        </Label>
+
+                                        <PasswordField fx:id="newPasswordField"
+                                                       prefHeight="36.0"
+                                                       promptText="At least 6 characters"
+                                                       style="-fx-background-color: rgba(255,255,255,0.96);
+                                                              -fx-background-radius: 10;
+                                                              -fx-border-radius: 10;
+                                                              -fx-border-color: #CFCFCF;
+                                                              -fx-padding: 0 12 0 12;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox maxWidth="280.0"
+                                      spacing="4.0">
+
+                                    <children>
+                                        <Label text="Confirm New Password"
+                                               textFill="#333333">
+                                            <font>
+                                                <Font name="System Bold"
+                                                      size="12.0" />
+                                            </font>
+                                        </Label>
+
+                                        <PasswordField fx:id="confirmPasswordField"
+                                                       prefHeight="36.0"
+                                                       promptText="Enter password again"
+                                                       style="-fx-background-color: rgba(255,255,255,0.96);
+                                                              -fx-background-radius: 10;
+                                                              -fx-border-radius: 10;
+                                                              -fx-border-color: #CFCFCF;
+                                                              -fx-padding: 0 12 0 12;" />
+                                    </children>
+                                </VBox>
+
+                                <Button fx:id="resetPasswordButton"
+                                        maxWidth="280.0"
+                                        mnemonicParsing="false"
+                                        onAction="#resetPassword"
+                                        prefHeight="38.0"
+                                        text="Reset Password"
+                                        textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="14.0" />
+                                    </font>
+                                </Button>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </right>
+
+        </BorderPane>
+    </children>
+</StackPane>
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\loginPage.fxml
+============================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.siliconsquad.siliconsquadmoviebooking.components.AnimatedLinesPane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane maxHeight="-Infinity"
+           maxWidth="-Infinity"
+           minHeight="-Infinity"
+           minWidth="-Infinity"
+           prefHeight="400.0"
+           prefWidth="600.0"
+           styleClass="main-background"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.LoginController">
+
+    <children>
+
+        <!--
+        This gradient creates the white login area while softly blending
+        into the blue section instead of creating a hard divider.
+        -->
+        <Pane maxWidth="390.0"
+              prefWidth="390.0"
+              StackPane.alignment="CENTER_RIGHT"
+              style="-fx-background-color: linear-gradient(to right,
+                     rgba(255,255,255,0.00) 0%,
+                     rgba(255,255,255,0.55) 9%,
+                     rgba(255,255,255,0.92) 20%,
+                     white 32%,
+                     white 100%);" />
+
+        <!-- One animation canvas covering the entire screen -->
+        <AnimatedLinesPane />
+
+        <!-- Login page content -->
+        <BorderPane style="-fx-background-color: transparent;">
+
+            <left>
+                <StackPane prefHeight="400.0"
+                           prefWidth="247.0"
+                           BorderPane.alignment="CENTER">
+
+                    <children>
+                        <ImageView fitHeight="230.0"
+                                   fitWidth="230.0"
+                                   preserveRatio="true"
+                                   smooth="true">
+
+                            <image>
+                                <Image url="@icon.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </StackPane>
+            </left>
+
+            <right>
+                <VBox alignment="CENTER"
+                      maxWidth="354.0"
+                      prefHeight="400.0"
+                      prefWidth="354.0"
+                      spacing="18.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER">
+
+                    <padding>
+                        <Insets bottom="35.0"
+                                left="45.0"
+                                right="30.0"
+                                top="35.0" />
+                    </padding>
+
+                    <children>
+                        <Label text="LOGIN"
+                               textFill="#1E90FF">
+
+                            <font>
+                                <Font name="System Bold"
+                                      size="30.0" />
+                            </font>
+                        </Label>
+
+                        <Label text="Sign in to continue"
+                               textFill="#777777">
+
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <VBox maxWidth="260.0"
+                              spacing="7.0">
+
+                            <children>
+                                <Label text="Username"
+                                       textFill="#333333">
+
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="13.0" />
+                                    </font>
+                                </Label>
+
+                                <TextField fx:id="usernameField"
+                                           id="login-username"
+                                           prefHeight="38.0"
+                                           promptText="Enter your username"
+                                           style="-fx-background-color: rgba(255,255,255,0.96);
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-radius: 10;
+                                                  -fx-border-color: #CFCFCF;
+                                                  -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="260.0"
+                              spacing="7.0">
+
+                            <children>
+                                <Label text="Password"
+                                       textFill="#333333">
+
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="13.0" />
+                                    </font>
+                                </Label>
+
+                                <PasswordField fx:id="passwordField"
+                                               id="login-password"
+                                               prefHeight="38.0"
+                                               promptText="Enter your password"
+                                               style="-fx-background-color: rgba(255,255,255,0.96);
+                                                      -fx-background-radius: 10;
+                                                      -fx-border-radius: 10;
+                                                      -fx-border-color: #CFCFCF;
+                                                      -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <Button fx:id="loginButton"
+                                maxWidth="260.0"
+                                mnemonicParsing="false"
+                                onAction="#moveToHome"
+                                prefHeight="38.0"
+                                text="Login"
+                                textFill="WHITE" />
+
+                        <HBox alignment="CENTER"
+                              spacing="10.0">
+
+                            <children>
+                                <Button fx:id="registerButton"
+                                        mnemonicParsing="false"
+                                        onAction="#moveToRegister"
+                                        text="Register"
+                                        textFill="WHITE" />
+
+                                <Button fx:id="forgotPasswordButton" onAction="#moveToForgotPassword"
+                                        mnemonicParsing="false"
+                                        text="Forgot Password"
+                                        textFill="WHITE" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </right>
+
+        </BorderPane>
+    </children>
+</StackPane>
+
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\mainPage.fxml
+============================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.siliconsquad.siliconsquadmoviebooking.components.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="main-background" stylesheets="@background.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+
+    <children>
+
+        <!-- White animated lines across the full blue page. -->
+        <MovieBackgroundPane />
+
+        <!-- Main page controls displayed above the animation. -->
+        <BorderPane style="-fx-background-color: transparent;">
+
+            <top>
+                <HBox alignment="CENTER" prefHeight="40.0" prefWidth="600.0" spacing="10.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#searchMovies" prefWidth="80.0" text="Search" />
+                        <TextField fx:id="searchField" prefHeight="25.0" prefWidth="305.0" promptText="Enter name of the movie here" />
+                    </children>
+                </HBox>
+            </top>
+
+            <left>
+                <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="350.0" spacing="20.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+
+                    <children>
+                        <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#logoutUser" prefWidth="80.0" text="Log out" />
+                    </children>
+                    <BorderPane.margin>
+                        <Insets top="20.0" />
+                    </BorderPane.margin>
+                </VBox>
+            </left>
+
+            <center>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                        <ScrollPane fitToWidth="true" maxHeight="724.0" styleClass="movie-scroll-pane">
+                            <content>
+                                <TilePane fx:id="movieGrid" hgap="10.0" maxHeight="724.0" styleClass="movie-grid" vgap="10.0" />
+                            </content>
+                        </ScrollPane>
+                  <ScrollPane fitToWidth="true" layoutX="10.0" layoutY="10.0" maxWidth="1400.0" prefHeight="300.0" style="-fx-background-color: white; -fx-background-radius: 22; -fx-border-radius: 22; -fx-border-color: rgba(22,35,50,0.78);" styleClass="movie-scroll-pane">
+                     <content>
+                        <TilePane fx:id="showtimesGrid" hgap="10.0" style="-fx-background-radius: 22; -fx-border-radius: 22;" vgap="10.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding></TilePane>
+                     </content>
+                  </ScrollPane>
+               </children>
+            </VBox>
+            </center>
+
+            <right>
+                <VBox prefHeight="325.0" prefWidth="8.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER" />
+            </right>
+
+        </BorderPane>
+    </children>
+</StackPane>
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\movieCard.fxml
+============================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="cardRoot"
+           maxHeight="225.0"
+           maxWidth="225.0"
+           minHeight="225.0"
+           minWidth="225.0"
+           prefHeight="225.0"
+           prefWidth="225.0"
+           styleClass="luxury-movie-card"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.MovieCardController">
+
+    <children>
+
+        <!-- WHITE FRONT SIDE: MOVIE NAME ONLY -->
+        <VBox fx:id="frontSide"
+              alignment="CENTER"
+              maxHeight="225.0"
+              maxWidth="225.0"
+              minHeight="225.0"
+              minWidth="225.0"
+              prefHeight="225.0"
+              prefWidth="225.0"
+              spacing="18.0"
+              styleClass="movie-card-front"
+              style="-fx-opacity: 1;">
+
+            <children>
+                <Label text="NOW SHOWING"
+                       style="-fx-text-fill: #1E90FF;">
+
+                    <font>
+                        <Font name="System Bold"
+                              size="11.0" />
+                    </font>
+                </Label>
+
+                <Label fx:id="movieNameLabel"
+                       alignment="CENTER"
+                       maxWidth="190.0"
+                       text="Movie"
+                       textAlignment="CENTER"
+                       wrapText="true"
+                       style="-fx-text-fill: #171717;">
+
+                    <font>
+                        <Font name="System Bold"
+                              size="18.0" />
+                    </font>
+                </Label>
+
+                <Label text="Hover to view details"
+                       style="-fx-text-fill: #777777;">
+
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+
+        <!-- BLUE BACK SIDE: MOVIE NAME AND DESCRIPTION -->
+        <VBox fx:id="backSide"
+              alignment="CENTER"
+              maxHeight="225.0"
+              maxWidth="225.0"
+              minHeight="225.0"
+              minWidth="225.0"
+              prefHeight="225.0"
+              prefWidth="225.0"
+              spacing="12.0"
+              styleClass="movie-card-back"
+              visible="false"
+              managed="false">
+
+            <padding>
+                <Insets bottom="20.0"
+                        left="20.0"
+                        right="20.0"
+                        top="20.0" />
+            </padding>
+
+            <children>
+                <Label fx:id="backMovieNameLabel"
+                       alignment="CENTER"
+                       maxWidth="185.0"
+                       text="Movie"
+                       textAlignment="CENTER"
+                       wrapText="true"
+                       style="-fx-text-fill: white;">
+
+                    <font>
+                        <Font name="System Bold"
+                              size="17.0" />
+                    </font>
+                </Label>
+
+                <Region prefHeight="1.0"
+                        prefWidth="115.0"
+                        style="-fx-background-color: rgba(255,255,255,0.60);" />
+
+                <Label fx:id="descriptionLabel"
+                       alignment="TOP_CENTER"
+                       maxHeight="115.0"
+                       maxWidth="185.0"
+                       text="Movie description"
+                       textAlignment="CENTER"
+                       wrapText="true"
+                       style="-fx-text-fill: white;">
+
+                    <font>
+                        <Font size="11.5" />
+                    </font>
+                </Label>
+
+                <Label text="Move cursor away to return"
+                       style="-fx-text-fill: #DCEEFF;">
+
+                    <font>
+                        <Font size="9.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+
+    </children>
+</StackPane>
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\com\siliconsquad\siliconsquadmoviebooking\registerPage.fxml
+============================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.siliconsquad.siliconsquadmoviebooking.components.AnimatedLinesPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity"
+           maxWidth="-Infinity"
+           minHeight="-Infinity"
+           minWidth="-Infinity"
+           prefHeight="400.0"
+           prefWidth="600.0"
+           styleClass="main-background"
+           stylesheets="@background.css"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.RegisterController">
+
+    <children>
+
+        <Pane maxWidth="430.0"
+              prefWidth="430.0"
+              StackPane.alignment="CENTER_RIGHT"
+              style="-fx-background-color: linear-gradient(to right,
+                     rgba(255,255,255,0.00) 0%,
+                     rgba(255,255,255,0.55) 9%,
+                     rgba(255,255,255,0.92) 20%,
+                     white 32%,
+                     white 100%);" />
+
+        <AnimatedLinesPane />
+
+        <BorderPane style="-fx-background-color: transparent;">
+
+            <left>
+                <VBox alignment="CENTER"
+                      prefHeight="400.0"
+                      prefWidth="247.0"
+                      spacing="18.0"
+                      BorderPane.alignment="CENTER">
+
+                    <children>
+                        <ImageView fitHeight="210.0"
+                                   fitWidth="210.0"
+                                   preserveRatio="true"
+                                   smooth="true">
+                            <image>
+                                <Image url="@icon.png" />
+                            </image>
+                        </ImageView>
+
+                        <Label alignment="CENTER"
+                               text="Already have an account?"
+                               textAlignment="CENTER"
+                               textFill="WHITE">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+
+                        <Button fx:id="backbutton"
+                                mnemonicParsing="false"
+                                onAction="#backToMain"
+                                prefHeight="34.0"
+                                prefWidth="140.0"
+                                text="Log in"
+                                textFill="WHITE" />
+                    </children>
+                </VBox>
+            </left>
+
+            <right>
+                <VBox alignment="CENTER"
+                      maxWidth="410.0"
+                      prefHeight="400.0"
+                      prefWidth="410.0"
+                      spacing="8.0"
+                      style="-fx-background-color: transparent;"
+                      BorderPane.alignment="CENTER">
+
+                    <padding>
+                        <Insets bottom="18.0"
+                                left="45.0"
+                                right="30.0"
+                                top="18.0" />
+                    </padding>
+
+                    <children>
+
+                        <Label text="CREATE ACCOUNT"
+                               textFill="#1E90FF">
+                            <font>
+                                <Font name="System Bold"
+                                      size="26.0" />
+                            </font>
+                        </Label>
+
+                        <Label text="Enter your information below"
+                               textFill="#777777">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <Label fx:id="messageLabel"
+                               alignment="CENTER"
+                               maxWidth="280.0"
+                               textAlignment="CENTER"
+                               textFill="#DD0808"
+                               wrapText="true">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Label>
+
+                        <VBox maxWidth="280.0"
+                              spacing="3.0">
+
+                            <children>
+                                <Label text="Full Name"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <TextField fx:id="nameField"
+                                           prefHeight="34.0"
+                                           promptText="Enter your full name"
+                                           style="-fx-background-color: rgba(255,255,255,0.96);
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-radius: 10;
+                                                  -fx-border-color: #CFCFCF;
+                                                  -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="280.0"
+                              spacing="3.0">
+
+                            <children>
+                                <Label text="Username"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <TextField fx:id="usernameField"
+                                           prefHeight="34.0"
+                                           promptText="Choose a username"
+                                           style="-fx-background-color: rgba(255,255,255,0.96);
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-radius: 10;
+                                                  -fx-border-color: #CFCFCF;
+                                                  -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="280.0"
+                              spacing="3.0">
+
+                            <children>
+                                <Label text="Date of Birth"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <TextField fx:id="dateOfBirthField"
+                                           prefHeight="34.0"
+                                           promptText="MM/DD/YYYY"
+                                           style="-fx-background-color: rgba(255,255,255,0.96);
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-radius: 10;
+                                                  -fx-border-color: #CFCFCF;
+                                                  -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="280.0"
+                              spacing="3.0">
+
+                            <children>
+                                <Label text="Password"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <PasswordField fx:id="passwordField"
+                                               prefHeight="34.0"
+                                               promptText="At least 6 characters"
+                                               style="-fx-background-color: rgba(255,255,255,0.96);
+                                                      -fx-background-radius: 10;
+                                                      -fx-border-radius: 10;
+                                                      -fx-border-color: #CFCFCF;
+                                                      -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="280.0"
+                              spacing="3.0">
+
+                            <children>
+                                <Label text="Confirm Password"
+                                       textFill="#333333">
+                                    <font>
+                                        <Font name="System Bold"
+                                              size="12.0" />
+                                    </font>
+                                </Label>
+
+                                <PasswordField fx:id="confirmPasswordField"
+                                               prefHeight="34.0"
+                                               promptText="Enter password again"
+                                               style="-fx-background-color: rgba(255,255,255,0.96);
+                                                      -fx-background-radius: 10;
+                                                      -fx-border-radius: 10;
+                                                      -fx-border-color: #CFCFCF;
+                                                      -fx-padding: 0 12 0 12;" />
+                            </children>
+                        </VBox>
+
+                        <Button fx:id="signupButton"
+                                maxWidth="280.0"
+                                mnemonicParsing="false"
+                                onAction="#signupUser"
+                                prefHeight="38.0"
+                                text="Sign Up"
+                                textFill="WHITE">
+                            <font>
+                                <Font name="System Bold"
+                                      size="14.0" />
+                            </font>
+                        </Button>
+                    </children>
+                </VBox>
+            </right>
+
+        </BorderPane>
+    </children>
+</StackPane>
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\movies.txt
+============================================================
+
+Matrix,A computer hacker discovers that the world he knows is a simulated reality controlled by intelligent machines.
+Avengers,Earth's greatest heroes unite to stop a powerful enemy whose plans threaten the future of the entire planet.
+Inception,A skilled thief enters people's dreams to steal secrets and is offered a chance to erase his troubled past.
+The Matrix Reloaded,Neo and his allies continue their fight as the machine army moves closer to humanity's final refuge.
+Forrest Gump,A kindhearted man experiences several major moments in history while remaining devoted to the woman he loves.
+Parasite,A struggling family slowly enters the lives of a wealthy household, leading to unexpected and dangerous consequences.
+Terminator,A relentless machine is sent from the future to eliminate the woman whose son will lead humanity's resistance.
+Gladiator,A betrayed Roman general becomes a gladiator and fights to avenge his family and restore honor to Rome.
+Jurassic Park,Scientists bring dinosaurs back to life, but a failure in the park's security system creates a fight for survival.
+Taxi Driver,A lonely New York taxi driver becomes increasingly disturbed by the violence and corruption surrounding him.
+Tarzan,A man raised in the jungle must choose between the family that raised him and the human world he has discovered.
+Rush Hour,A Hong Kong inspector and a fast-talking Los Angeles detective work together to solve a kidnapping.
+Interstellar,A team of explorers travels through a wormhole in space to search for a new home for humanity.
+The Dark Knight,Batman faces a criminal mastermind whose campaign of chaos pushes Gotham City and its heroes to their limits.
+Titanic,Two passengers from different social classes fall in love aboard the famously doomed ocean liner.
+Pulp Fiction,Several interconnected stories of crime, loyalty, and redemption unfold across the streets of Los Angeles.
+The Godfather,The youngest son of a powerful crime family is gradually drawn into the family's dangerous business.
+Goodfellas,A young man enters organized crime and experiences its wealth, loyalty, violence, and eventual collapse.
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\src\main\resources\showtimes.txt
+============================================================
+
+1,Matrix,Room 1,2026-09-20T14:30,20.00
+2,Matrix,Room 2,2026-09-20T15:30,20.00
+3,Matrix,Room 3,2026-09-20T16:30,20.00
+4,Matrix,Room 4,2026-09-20T17:30,20.00
+5,Matrix,Room 1,2026-09-20T18:30,20.00
+6,Matrix,Room 2,2026-09-20T19:30,20.00
+7,Matrix,Room 3,2026-09-20T20:30,20.00
+
+============================================================
+FILE: C:\Users\GG\silicon-squad-movie-booking\users.txt
+============================================================
+
+Test User,testuser,test123
+Test User,testuser,test123
+John Smith,jsmith,Password123
+aka,aka,Aka1978
+ggg,ggg,ggg
+Garnik Mkrtchyan,gggggg,09/20/2004,bbbbbb
+Trong Dinh,trongdinh,12/04/1996,123456

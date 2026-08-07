@@ -1,0 +1,669 @@
+.booking-root {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #55B9F3,
+            #BEE8FF
+        );
+    -fx-font-family: "Segoe UI";
+}
+
+.booking-overlay {
+    -fx-background-color: transparent;
+}
+
+/* Main dark theater card */
+
+.theater-card {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #0D213A 0%,
+            #061426 55%,
+            #03101F 100%
+        );
+
+    -fx-background-radius: 28;
+    -fx-border-radius: 28;
+    -fx-border-color: rgba(76, 174, 255, 0.22);
+    -fx-border-width: 1;
+
+    -fx-padding: 24 28 20 28;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.40),
+            28,
+            0.22,
+            0,
+            10
+        );
+}
+
+.movie-title {
+    -fx-text-fill: white;
+    -fx-font-size: 29px;
+    -fx-font-weight: 800;
+}
+
+.showtime-text {
+    -fx-text-fill: #69BCFF;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.screen-title {
+    -fx-text-fill: #EAF7FF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.screen-holder {
+    -fx-alignment: center;
+}
+
+.screen-glow {
+    -fx-pref-height: 9px;
+    -fx-max-height: 9px;
+
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #FFFFFF,
+            #8ED6FF
+        );
+
+    -fx-background-radius: 100% 100% 25% 25%;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(53, 173, 255, 0.95),
+            24,
+            0.55,
+            0,
+            3
+        );
+}
+
+/* Seat grid labels */
+
+.seat-number-header {
+    -fx-min-width: 27px;
+    -fx-pref-width: 27px;
+    -fx-max-width: 27px;
+
+    -fx-text-fill: #EAF3FC;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.row-letter {
+    -fx-min-width: 27px;
+    -fx-pref-width: 27px;
+    -fx-max-width: 27px;
+
+    -fx-text-fill: #F6FAFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Dynamically generated seat buttons */
+
+.seat-button {
+    -fx-min-width: 27px;
+    -fx-pref-width: 27px;
+    -fx-max-width: 27px;
+
+    -fx-min-height: 24px;
+    -fx-pref-height: 24px;
+    -fx-max-height: 24px;
+
+    -fx-padding: 0;
+
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #FFFFFF,
+            #CFD7E1
+        );
+
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+
+    -fx-border-color: rgba(255, 255, 255, 0.70);
+    -fx-border-width: 1;
+
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+
+    -fx-cursor: hand;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.42),
+            4,
+            0.20,
+            0,
+            2
+        );
+}
+
+.seat-button:hover {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #D8F1FF,
+            #80CFFF
+        );
+
+    -fx-border-color: #77C9FF;
+
+    -fx-scale-x: 1.10;
+    -fx-scale-y: 1.10;
+}
+
+.seat-button:selected {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #34AFFF,
+            #006EEA
+        );
+
+    -fx-border-color: #79D1FF;
+    -fx-border-width: 1.5;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(21, 148, 255, 0.95),
+            12,
+            0.45,
+            0,
+            2
+        );
+}
+
+/* Seat legend */
+
+.seat-legend {
+    -fx-padding: 5 0 0 0;
+}
+
+.legend-seat {
+    -fx-min-width: 21px;
+    -fx-pref-width: 21px;
+    -fx-max-width: 21px;
+
+    -fx-min-height: 19px;
+    -fx-pref-height: 19px;
+    -fx-max-height: 19px;
+
+    -fx-background-radius: 5;
+}
+
+.available-seat {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #FFFFFF,
+            #CFD7E1
+        );
+}
+
+.selected-seat {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #34AFFF,
+            #006EEA
+        );
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(21, 148, 255, 0.75),
+            8,
+            0.35,
+            0,
+            1
+        );
+}
+
+.unavailable-seat {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #778392,
+            #3D4855
+        );
+
+    -fx-opacity: 0.75;
+}
+
+.legend-label {
+    -fx-text-fill: #E7EFF8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.back-theater-label {
+    -fx-text-fill: #B6C8D9;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+
+    -fx-border-color: #185790;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+
+    -fx-padding: 7 28;
+}
+
+/* Checkout card */
+
+.checkout-card {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.98),
+            rgba(246, 250, 255, 0.98)
+        );
+
+    -fx-background-radius: 28;
+    -fx-border-radius: 28;
+
+    -fx-border-color: rgba(255, 255, 255, 0.85);
+    -fx-border-width: 1;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(16, 54, 88, 0.28),
+            28,
+            0.18,
+            0,
+            10
+        );
+}
+
+.cart-icon-circle {
+    -fx-min-width: 66px;
+    -fx-pref-width: 66px;
+    -fx-max-width: 66px;
+
+    -fx-min-height: 66px;
+    -fx-pref-height: 66px;
+    -fx-max-height: 66px;
+
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #62C4FF,
+            #157CFF
+        );
+
+    -fx-background-radius: 50%;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(25, 122, 230, 0.30),
+            15,
+            0.25,
+            0,
+            5
+        );
+}
+
+.cart-icon {
+    -fx-font-size: 28px;
+}
+
+.checkout-title {
+    -fx-text-fill: #132640;
+    -fx-font-size: 27px;
+    -fx-font-weight: 800;
+}
+
+.checkout-divider {
+    -fx-background-color: #D7E0E9;
+    -fx-pref-height: 1px;
+    -fx-max-height: 1px;
+}
+
+.section-icon {
+    -fx-text-fill: #238EF5;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.summary-heading {
+    -fx-text-fill: #53667B;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.seat-count {
+    -fx-text-fill: #8A98A8;
+    -fx-font-size: 11px;
+}
+
+.selected-seats-box {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #EDF7FF,
+            #E1F0FF
+        );
+
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+
+    -fx-border-color: #A9D7FF;
+    -fx-border-width: 1.2;
+
+    -fx-padding: 12;
+}
+
+.selected-seats-value {
+    -fx-text-fill: #1977E7;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.total-price-box {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #F1FFF3,
+            #E1F7E5
+        );
+
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+
+    -fx-border-color: #B8E3C0;
+    -fx-border-width: 1.2;
+
+    -fx-padding: 12;
+}
+
+.total-price-value {
+    -fx-text-fill: #108532;
+    -fx-font-size: 25px;
+    -fx-font-weight: 800;
+}
+
+/* Checkout buttons */
+
+.review-button {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #2CADFF,
+            #0878EE
+        );
+
+    -fx-background-radius: 11;
+    -fx-border-radius: 11;
+
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 13 18;
+
+    -fx-cursor: hand;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 105, 220, 0.25),
+            10,
+            0.20,
+            0,
+            4
+        );
+}
+
+.review-button:hover {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #55BEFF,
+            #1487FA
+        );
+}
+
+.review-button:pressed {
+    -fx-background-color: #076ACF;
+}
+
+.booking-back-button {
+    -fx-background-color: white;
+
+    -fx-background-radius: 11;
+    -fx-border-radius: 11;
+
+    -fx-border-color: #198BFA;
+    -fx-border-width: 1.4;
+
+    -fx-text-fill: #147CE3;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 12 18;
+
+    -fx-cursor: hand;
+}
+
+.booking-back-button:hover {
+    -fx-background-color: #EDF7FF;
+}
+
+.booking-back-button:pressed {
+    -fx-background-color: #DCEFFF;
+}
+
+.secure-label {
+    -fx-text-fill: #7C8EA0;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.tooltip {
+    -fx-font-size: 13px;
+    -fx-padding: 7px 10px;
+}
+
+/* =========================================================
+   Larger booking-page design
+   ========================================================= */
+
+.theater-card {
+    -fx-padding: 28 38 26 38;
+    -fx-spacing: 15;
+}
+
+.movie-title {
+    -fx-font-size: 32px;
+}
+
+.showtime-text {
+    -fx-font-size: 17px;
+}
+
+.screen-title {
+    -fx-font-size: 14px;
+}
+
+.screen-holder {
+    -fx-pref-height: 35px;
+    -fx-max-width: 830px;
+}
+
+.screen-glow {
+    -fx-pref-height: 11px;
+    -fx-max-height: 11px;
+}
+
+/* Larger seat numbers */
+
+.seat-number-header {
+    -fx-min-width: 35px;
+    -fx-pref-width: 35px;
+    -fx-max-width: 35px;
+
+    -fx-font-size: 13px;
+}
+
+.row-letter {
+    -fx-min-width: 35px;
+    -fx-pref-width: 35px;
+    -fx-max-width: 35px;
+
+    -fx-font-size: 15px;
+}
+
+/* Larger clickable seats */
+
+.seat-button {
+    -fx-min-width: 35px;
+    -fx-pref-width: 35px;
+    -fx-max-width: 35px;
+
+    -fx-min-height: 31px;
+    -fx-pref-height: 31px;
+    -fx-max-height: 31px;
+
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+.seat-button:hover {
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
+/* Legend squares displayed above the text */
+
+.seat-legend {
+    -fx-padding: 15 0 3 0;
+}
+
+.legend-item {
+    -fx-min-width: 105px;
+}
+
+.legend-seat {
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-max-width: 34px;
+
+    -fx-min-height: 31px;
+    -fx-pref-height: 31px;
+    -fx-max-height: 31px;
+
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+}
+
+.available-seat {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #FFFFFF,
+            #D7DEE7
+        );
+
+    -fx-border-color: white;
+    -fx-border-width: 1;
+}
+
+.selected-seat {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #35AEFF,
+            #006DEB
+        );
+
+    -fx-border-color: #7BD4FF;
+    -fx-border-width: 1.5;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(20, 148, 255, 0.95),
+            13,
+            0.45,
+            0,
+            2
+        );
+}
+
+/* Red square for unavailable seats */
+
+.unavailable-seat {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #FF4C59,
+            #D80F24
+        );
+
+    -fx-border-color: #FF929A;
+    -fx-border-width: 1.5;
+    -fx-opacity: 1;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(230, 25, 45, 0.55),
+            9,
+            0.35,
+            0,
+            2
+        );
+}
+
+.legend-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Larger back-of-theater label */
+
+.back-theater-label {
+    -fx-font-size: 13px;
+    -fx-padding: 9 40;
+}
+
+/* Your project logo above Checkout Cart */
+
+.checkout-logo {
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(14, 91, 160, 0.25),
+            14,
+            0.20,
+            0,
+            4
+        );
+}
+
+.checkout-title {
+    -fx-font-size: 29px;
+}
+
+.checkout-card {
+    -fx-pref-width: 340px;
+    -fx-max-width: 340px;
+}

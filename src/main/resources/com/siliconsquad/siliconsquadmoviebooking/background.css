@@ -144,3 +144,453 @@
     -fx-font-size: 16px;
     -fx-padding: 8px;
 }
+
+/* ============================================================
+   Professional movie cards
+   ============================================================ */
+
+.professional-movie-card {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0.99),
+            rgba(240,247,253,0.99)
+        );
+
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+
+    -fx-border-color: rgba(56,88,116,0.45);
+    -fx-border-width: 1.2;
+
+    -fx-cursor: hand;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(13,54,90,0.22),
+            14,
+            0.16,
+            0,
+            5
+        );
+}
+
+.professional-movie-card:hover {
+    -fx-border-color: #188EFF;
+    -fx-border-width: 2;
+
+    -fx-translate-y: -4;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(17,130,235,0.32),
+            20,
+            0.22,
+            0,
+            8
+        );
+}
+
+.selected-movie-card {
+    -fx-border-color: #087FFF;
+    -fx-border-width: 3;
+
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            #FFFFFF,
+            #E7F4FF
+        );
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(10,126,255,0.52),
+            22,
+            0.30,
+            0,
+            7
+        );
+}
+
+.movie-card-content {
+    -fx-background-color: transparent;
+}
+
+.poster-holder {
+    -fx-background-color: #E8EFF5;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0,0,0,0.24),
+            8,
+            0.16,
+            0,
+            3
+        );
+}
+
+.movie-poster {
+    -fx-background-radius: 10;
+}
+
+.professional-movie-title {
+    -fx-text-fill: #111D2B;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.movie-description-preview {
+    -fx-text-fill: #69788A;
+    -fx-font-size: 9px;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.view-showtimes-label {
+    -fx-text-fill: #087FFF;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+
+    -fx-border-color: #5DAEFF;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+
+    -fx-padding: 5 14;
+}
+
+/* ============================================================
+   Showtime panel
+   ============================================================ */
+
+.showtime-panel-title {
+    -fx-text-fill: #123253;
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+
+    -fx-padding: 8 15;
+}
+
+.showtime-placeholder {
+    -fx-text-fill: #738397;
+    -fx-font-size: 14px;
+
+    -fx-padding: 12 18;
+}
+
+.modern-showtime-button {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #32A7FF,
+            #087BF0
+        );
+
+    -fx-background-radius: 11;
+    -fx-border-radius: 11;
+
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 9 16;
+    -fx-cursor: hand;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0,99,210,0.23),
+            8,
+            0.17,
+            0,
+            3
+        );
+}
+
+.modern-showtime-button:hover {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #5CBBFF,
+            #168AFF
+        );
+
+    -fx-translate-y: -2;
+}
+
+/* ============================================================
+   Main navigation
+   ============================================================ */
+
+.professional-main-overlay {
+    -fx-background-color: transparent;
+}
+
+.main-navigation-card {
+    -fx-background-color: rgba(255,255,255,0.97);
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(113,170,220,0.28);
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(25,91,150,0.18),
+        18,
+        0.18,
+        0,
+        5
+    );
+}
+
+.brand-title {
+    -fx-text-fill: #15375B;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.brand-subtitle {
+    -fx-text-fill: #58728D;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.professional-search-field {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 9 0 0 9;
+    -fx-border-radius: 9 0 0 9;
+    -fx-border-color: #CBD7E2;
+    -fx-padding: 9 13;
+    -fx-font-size: 13px;
+}
+
+.professional-search-button {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #32A7FF,
+            #087AF0
+        );
+    -fx-background-radius: 0 9 9 0;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 9 22;
+}
+
+.professional-logout-button {
+    -fx-background-color: white;
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-border-color: #A8D4FA;
+    -fx-text-fill: #147FE8;
+    -fx-font-weight: bold;
+    -fx-padding: 9 18;
+}
+
+.now-showing-header {
+    -fx-padding: 5 18 2 18;
+}
+
+.now-showing-title {
+    -fx-text-fill: #17395D;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.now-showing-subtitle {
+    -fx-text-fill: #617990;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 0 38;
+}
+
+/* ============================================================
+   Professional available-showtimes section
+   ============================================================ */
+
+.professional-showtimes-panel {
+    -fx-background-color:
+        linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0.99),
+            rgba(245,250,255,0.99)
+        );
+
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+
+    -fx-border-color: #B9D9F4;
+    -fx-border-width: 1;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(25,89,145,0.22),
+            18,
+            0.18,
+            0,
+            6
+        );
+}
+
+.showtime-section-header {
+    -fx-padding: 0 0 7 0;
+}
+
+.showtime-header-icon {
+    -fx-text-fill: #148DFA;
+    -fx-font-size: 27px;
+    -fx-font-weight: bold;
+}
+
+.showtime-header-title {
+    -fx-text-fill: #17395D;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.showtime-content {
+    -fx-padding: 2 5 4 5;
+}
+
+.selected-movie-info {
+    -fx-min-width: 285px;
+    -fx-pref-width: 285px;
+}
+
+.showtime-movie-poster {
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0,0,0,0.25),
+            9,
+            0.16,
+            0,
+            4
+        );
+}
+
+.selected-showtime-movie-title {
+    -fx-text-fill: #1386F4;
+    -fx-font-size: 19px;
+    -fx-font-weight: 800;
+}
+
+.selected-showtime-description {
+    -fx-text-fill: #617487;
+    -fx-font-size: 10px;
+}
+
+.showtime-instruction {
+    -fx-text-fill: #4A6680;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.showtime-divider {
+    -fx-background-color: #D6E1EB;
+    -fx-min-width: 1px;
+    -fx-pref-width: 1px;
+    -fx-max-width: 1px;
+    -fx-min-height: 135px;
+}
+
+.room-columns {
+    -fx-padding: 0 5 0 5;
+}
+
+.room-column {
+    -fx-min-width: 125px;
+    -fx-pref-width: 125px;
+}
+
+.room-icon {
+    -fx-text-fill: #1B94F7;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.room-title {
+    -fx-text-fill: #284966;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.room-time-button {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #A8D2F7;
+    -fx-border-width: 1;
+
+    -fx-text-fill: #1181EA;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 4 14;
+    -fx-cursor: hand;
+}
+
+.room-time-button:hover {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            #3BAEFF,
+            #087BF0
+        );
+
+    -fx-text-fill: white;
+    -fx-border-color: #087BF0;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(15,124,235,0.28),
+            8,
+            0.18,
+            0,
+            3
+        );
+}
+
+.room-time-button:pressed {
+    -fx-background-color: #096FD4;
+}
+
+.no-room-times {
+    -fx-text-fill: #A0ADBA;
+    -fx-font-size: 10px;
+    -fx-padding: 6;
+}
+
+.showtime-footer {
+    -fx-text-fill: #6C7F91;
+    -fx-font-size: 10px;
+    -fx-alignment: center;
+    -fx-max-width: Infinity;
+    -fx-padding: 3 0 0 0;
+}
+
+.showtime-placeholder-box {
+    -fx-min-height: 140px;
+    -fx-background-color: #F3F8FC;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #D6E5F1;
+    -fx-border-style: segments(7, 7);
+}
+
+.showtime-empty-title {
+    -fx-text-fill: #264B6B;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.showtime-empty-message {
+    -fx-text-fill: #74899C;
+    -fx-font-size: 13px;
+}
