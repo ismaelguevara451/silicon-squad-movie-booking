@@ -5,6 +5,8 @@ import java.util.Objects;
 /**
  * Represents a seat inside a movie theater auditorium.
  * Stores the seat's location, type, and reservation status.
+ * @author G. Mkrtchyan
+ * @since July 6, 2026
  */
 public class Seat {
 

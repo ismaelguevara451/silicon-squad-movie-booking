@@ -22,10 +22,23 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// This class manages movies, showtimes, and auditoriums.
+/**
+ * Manages movie, showtime, and auditorium information.
+ * This class provides methods for loading movies and showtimes from files,
+ * creating auditoriums, assigning showtimes to movies, and searching movies.
+ * @author I. Regalado
+ * @since July 21, 2026
+ */
 public class MovieManager {
 
-    // This method loads movie information from the movies.txt file.
+    /**
+     * Loads movie information from the movies.txt file.
+     * Each line must contain a movie title and description separated
+     * by a comma.
+     *
+     * @return a list containing all movies loaded from the file
+     * @throws IOException if movies.txt cannot be found or read
+     */
     public static List<Movie> loadMovies() throws IOException {
 
         // Create an empty list that will store the movies.
@@ -78,7 +91,17 @@ public class MovieManager {
         return movies;
     }
 
-    // This method loads showtime information from the showtimes.txt file.
+    /**
+     * Loads showtime information from the showtimes.txt file.
+     * Each line must contain the showtime ID, movie title, room name,
+     * starting date and time, and ticket price.
+     *
+     * @return a list containing all showtimes loaded from the file
+     * @throws IOException if showtimes.txt cannot be found or read
+     * @throws NumberFormatException if the ID or ticket price is not valid
+     * @throws java.time.format.DateTimeParseException if the starting
+     *         date and time is not valid
+     */
     public static List<Showtime> loadShowtimes() throws IOException {
 
         // Create an empty list that will store the showtimes.
@@ -144,7 +167,14 @@ public class MovieManager {
         return showtimes;
     }
 
-    // This method creates an Auditorium object based on a room name.
+
+    /**
+     * Creates an auditorium based on the provided room name.
+     *
+     * @param room the name of the auditorium
+     * @return the matching Auditorium object, or null if the room
+     *         name is not recognized
+     */
     public static Auditorium createAuditorium(String room) {
 
         // Check which room name was provided.
@@ -172,7 +202,13 @@ public class MovieManager {
         }
     }
 
-    // This method connects each showtime to its matching movie.
+
+    /**
+     * Assigns each showtime to the movie with the matching title.
+     *
+     * @param movies the list of movies that will receive showtimes
+     * @param showtimes the list of showtimes that will be assigned
+     */
     public static void assignShowtimes(
             List<Movie> movies,
             List<Showtime> showtimes
@@ -194,7 +230,14 @@ public class MovieManager {
         }
     }
 
-    // This method searches for movies whose titles contain a keyword.
+    /**
+     * Searches for movies whose titles contain the provided keyword.
+     * The search is not case-sensitive.
+     *
+     * @param movies the list of movies that will be searched
+     * @param keyword the title keyword used for the search
+     * @return a list containing all matching movies
+     */
     public static List<Movie> searchMovies(
             List<Movie> movies,
             String keyword

@@ -9,6 +9,8 @@ import java.util.Objects;
 /**
  * Represents an auditorium inside a movie theater, holds seat configurations
  * and layout information.
+ * @author G. Mkrtchyan
+ * @since July 6, 2026
  */
 public class Auditorium {
 

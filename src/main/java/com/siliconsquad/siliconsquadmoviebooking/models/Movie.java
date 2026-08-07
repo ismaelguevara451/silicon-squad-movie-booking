@@ -6,6 +6,8 @@ import java.util.List;
 /**
  * Represents a movie in the movie booking system.
  * Keeps track of the movie's title, description, and scheduled showtimes.
+ * @author G. Mkrtchyan
+ * @since July 6, 2026
  */
 public class Movie {
 

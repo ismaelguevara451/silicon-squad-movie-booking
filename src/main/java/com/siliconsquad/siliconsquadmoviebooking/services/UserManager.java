@@ -11,13 +11,25 @@ import java.util.List;
 
 import com.siliconsquad.siliconsquadmoviebooking.models.User;
 
-// This class manages user registration, login, and password operations.
+/**
+ * Manages user account operations for the Movie Booking System.
+ * This class provides methods for saving users, validating login
+ * information, checking usernames, verifying users, and updating passwords.
+ * @author I. Regalado
+ * @since June 24, 2026
+ */
 public class UserManager {
 
-    // Store the location of the file that contains user account information.
     private static final String FILE_PATH = "users.txt";
 
-    // This method saves a new user account to users.txt.
+    /**
+     * Saves a new user account to the users file.
+     * The user is added to the end of the file without deleting
+     * existing user records.
+     *
+     * @param user the User object that will be saved
+     * @throws IOException if the users file cannot be opened or written to
+     */
     public static void saveUser(User user) throws IOException {
 
         // Open users.txt in append mode so existing accounts are not deleted.
@@ -31,7 +43,17 @@ public class UserManager {
         }
     }
 
-    // This method checks whether a username and password are valid.
+    /**
+     * Checks whether the provided username and password match
+     * a stored user account.
+     *
+     * This method supports both current user records containing four
+     * values and older user records containing three values.
+     *
+     * @param username the username entered by the user
+     * @param password the password entered by the user
+     * @return true if the username and password match, otherwise false
+     */
     public static boolean validateLogin(
             String username,
             String password
@@ -85,7 +107,13 @@ public class UserManager {
         return false;
     }
 
-    // This method checks whether a username is already registered.
+    /**
+     * Checks whether a username is already stored in the users file.
+     * The username comparison is not case-sensitive.
+     *
+     * @param username the username that will be checked
+     * @return true if the username already exists, otherwise false
+     */
     public static boolean usernameExists(String username) {
 
         // Open users.txt and automatically close it after reading.
@@ -118,7 +146,13 @@ public class UserManager {
         return false;
     }
 
-    // This method verifies a user using a username and date of birth.
+    /**
+     * Verifies a user using their username and date of birth.
+     *
+     * @param username the username of the account
+     * @param dateOfBirth the date of birth connected to the account
+     * @return true if the username and date of birth match, otherwise false
+     */
     public static boolean verifyUser(
             String username,
             String dateOfBirth
@@ -158,7 +192,15 @@ public class UserManager {
         return false;
     }
 
-    // This method replaces a user's current password with a new password.
+    /**
+     * Replaces the password of a stored user account.
+     * The method reads all user records, changes the matching user's
+     * password, and rewrites the users file.
+     *
+     * @param username the username of the account being updated
+     * @param newPassword the new password that will replace the old password
+     * @return true if the password was updated, otherwise false
+     */
     public static boolean updatePassword(
             String username,
             String newPassword
